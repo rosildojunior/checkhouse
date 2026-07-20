@@ -1,0 +1,2306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#1F2937">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Check House">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAIBklEQVR4nO3dfUzU9x3A8d8BJ3AHR8EHQJ7uEFE4qKil6HRo2wwlbutom7TJkpbNxJWsMe3qHpIumvafdjrNtq41Nl3Wdsus6RJnZ+pDfVhXtbYqMFCq+AByYCoVi3fHAUK5/UFCCN28n3x+d8f37v36i+iH333Et7978u5M/hOaTva1FXpHETViwr0A1EZAECEgiBAQRAgIIgQEEQKCCAFBhIAgQkAQISCIEBBECAgiBAQRAoIIAUGEgCBCQBAhIIgQEEQICCIEBBECgkicgcfKqqk28GgItq7d++QH4QwEEQKCiJFXYWPcXa5gHBaGsGXlGHg0zkAQISCIEBBECAgiBAQRAoIIAUGEgCBCQBAhIIgQEEQICCIEBBECgggBQYSAIEJAECEgiBAQRAgIIgQEEQKCCAFBhIAgQkAQISCIEBBECAgiBAQRAoIIAUGEgCBCQBAhIIgQEEQICCIEBBECgggBQYSAIEJAECEgiBAQRAgIIgQEEQKCCAFBJCifFzYVpCYnlzjsTofdkZmZkZaakZZqTUxMMJvNcXF9AwOe/n6vr7/H7W51dV7ocJ3vcF3u6hrx+8O9tXoiLaCcWTPXLF2ysmxBsT3PZDL9z5lkiyXZYtGma5qmLXUWj/7iTbfnSEPD4TMNn7Z8PjQ8HPCCZs+YceC3r9x5psftXrn+Z3f3B9C06or7N9etu/PM0frG9X/4490eORgiJ6CK4qLa6lXLSpz/r5s7S7MlP7ai8rEVlb1e764j//rbocM33R7Dl4w8kRBQQdbsDU88vqzUacjR7klK+sn3v1tbvWrnoSNbd71nyDEjmNo3ok0m01Orq3a9uNGoesbEm81V999n7DEjksJnoMT4+M1161aWLQj3IlFN1YDuSUraseG5YnteuBeJdkpehVkS4rc//yz1TAXqBWQymbb+tK7EYQ/3ItA0Fa/C1q6pXl5aon/e7/fXt178uKm5+Uqbq7v7K4/39vCwzWJJsVptVos9I+PeOfkLCvILs3NiY9X75xR2igU0Nzv7mZof6Bz2+/3vHz+x4/29ru4vJ/xWr9fb6/VqmtZ8pe2fJz7RNC3ZYnlw0cJHKpcvKpxr6MoRTrGAfvnDJ3SeJ7p7e3/++o761os6j+zx+fYcO77n2PH5uTlPP/y9BxctFKwZRVQKaFmps6Jovp7Jq19c//ErW7p7eydxKec7XM+++nqJw/7k6qpJfHu0Uela/8lVuv5GPT7fui3bJlfPmLNt7b/Y/obkCFFCmYDy0tO/VaLr4eaX3v7LtZ6eYO+DUcoE9J3yxXrGPjx9Zv+np4K9DMYoE9BDixfpGXtr34Fgb4Lx1AgoMT6+OC834FjT5StNl6+EYB+MUSMgp8MeExN41QOfceUVamrcjS/MztYz1njpcrA3uSvTbbbmt94M9xbBpcYZKGvmjIAzg0NDLe1XQ7AMxlMjoMzpaQFnXNe7h7/+OgTLYDw1ArJZrQFn3D5fCDbBBGoElGA2B5y51dcXgk0wgRoBTTMHvrHvGxgIwSaYQI2AhoYD37ixxCeEYBNMoEZA/bdvB5yxWS0h2AQTqBGQR8cN5BQdN7RhODUeSLx2I/Cz6zmzZsbFxk6pe/LBe2nz1KHGGejajRsBZ+KnTSvS8XwZjKVGQK2uTj1jZQUFwd4EE6gR0Ln29pGRkYBjqyvKQ7AMxlMjIN/A4OdXOwKO3TsnvzTfEYJ9MEaNgDRNO1zfoGestnp1sDfBeMoEdPDUaT1jVeWLq/T951cYQpmArn5x/ZNzLXomN9U+lZEW+Nl7GEKZgDRNe2f/QT1jNqtlx4bnZqSkSC7L6bD/5mllHowJI5UCOtZ89tT5C3om82dnvrvp12UFcyZxKfNycrY9U7dz4wtlcyfz7dFGjUeix7z8153vvbhRz6ub09NS337hV7v/fezNvR90fjnxtfHflJSY+MDCskcql983f54Rm0YLxQK62Nn52j/2rH+0Rs9wjMn06Ipv11QuP3Oh9eP/NDe3tbm6u3u9fUPDw8mJiTarJcVqzU1PH73zX5SXa45T7KcxFaj3I/vT3g8WFxbqf1PEGJOpfP68cs4rwaHSbaBRI37/869tP9vWHu5FoGkqBqRpWt/AQN3W3/EajKlAyYA0Tev1emtf3vxRY1O4F4l2qgakaVr/4OD637+6bdffb+v4ZAIEicIBaZo24vf/ed/+xze9pPNBav0Gh4YOfqbryZMop969sG+61HVt3ZZtS5zFP6petdRZPLnPyhhzq6/v3cNH+awMnSIhoFEnz7WcPNeSmz5rzdIlDyxcUJR3d+8i/ZXHc7Sh8dDp+pP6Pq0Ho0z+E3pH7Wsr7jyQVVM9+oW7yyXZyRBptuTSfEex3Z6fmZkxPS09NdWakBA/zWyOjfUNDnp8/d5+X88td6ur84Kr83xHx6XOaPm8MFtWzugXXbv3yY8WOWegCW66PR81NnE3LdjUvhGNsCMgiBAQRAgIIgQEEQKCCAFBhIAgQkAQISCIEBBECAgiBAQRAoIIAUGEgCBCQBAhIIgQEEQICCIEBBECgggBQYSAIEJAECEgiBAQRAgIIgQEEQKCCAFBhIAgQkAQISCIEBBECAgiBAQRAoIIAUGEgCBCQBAJyjvVj72ZPiIeZyCIEBBEjLwKM+TTX6AWzkAQISCIEBBECAgiBAQRAoIIAUGEgCBCQBAhIIgQEEQICCIEBBECgggBQYSAIEJAECEgiBAQRAgIIgQEEQKCyH8BItXclRUPE3gAAAAASUVORK5CYII=">
+<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check House 1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('WJ9WEsj-L6-eco694');</script>
+
+<style>
+  :root{
+    --ink:#1F2937;
+    --ink-soft:#4B5566;
+    --paper:#F2F4F3;
+    --paper-card:#FFFFFF;
+    --line:#D8DEE2;
+    --accent:#2C5F63; /* teal-slate: profissional, não genérico */
+    --accent-soft:#E4EEEE;
+    --ok:#3B7A4E;
+    --ok-soft:#E5F0E7;
+    --warn:#B4790A;
+    --warn-soft:#FBF0DC;
+    --danger:#A63D2F;
+    --danger-soft:#F7E7E3;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  header.topbar{
+    background:var(--ink);
+    color:#fff;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  header.topbar .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  header.topbar .brand-mark{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.14em;
+    color:var(--accent-soft);
+    background:rgba(255,255,255,0.08);
+    padding:4px 8px;
+    border-radius:6px;
+  }
+  header.topbar h1{
+    font-size:17px;
+    margin:0;
+    font-weight:600;
+  }
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:20px 16px 100px;
+  }
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* ---- Home: lista de vistorias ---- */
+  .home-actions{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .btn{
+    border:none;
+    border-radius:var(--radius);
+    padding:13px 18px;
+    font-size:15px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-primary{background:var(--accent);color:#fff;flex:1;justify-content:center;}
+  .btn-ghost{background:var(--paper-card);color:var(--ink);border:1px solid var(--line);}
+  .btn-block{width:100%;justify-content:center;}
+  .btn-danger-outline{background:#fff;color:var(--danger);border:1px solid var(--danger);}
+
+  .empty-state{
+    background:var(--paper-card);
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+    padding:32px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+  }
+  .empty-state strong{display:block;color:var(--ink);margin-bottom:6px;font-size:15px;}
+
+  .vistoria-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:10px;
+    cursor:pointer;
+  }
+  .vistoria-card.tipo-saida{border-left-color:var(--warn);}
+  .vistoria-card .row1{display:flex;justify-content:space-between;align-items:center;}
+  .vistoria-card .endereco{font-weight:600;font-size:15px;}
+  .vistoria-card .tag{
+    font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
+    padding:3px 8px;border-radius:20px;
+  }
+  .tag-entrada{background:var(--accent-soft);color:var(--accent);}
+  .tag-saida{background:var(--warn-soft);color:var(--warn);}
+  .vistoria-card .meta{font-size:12.5px;color:var(--ink-soft);margin-top:5px;}
+
+  /* ---- Formulário ---- */
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:26px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+  }
+  .field .hint{font-size:12px;color:var(--ink-soft);font-weight:400;margin-top:4px;}
+  input[type=text], input[type=number], input[type=date], select, textarea{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:15px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink);
+  }
+  input:disabled, textarea:disabled{
+    background:#EDEFF0;
+    color:var(--ink-soft);
+    cursor:not-allowed;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+    border-color:var(--accent);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .tipo-toggle{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .tipo-toggle label{
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 12px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:600;
+    color:var(--ink-soft);
+    background:#fff;
+  }
+  .tipo-toggle input{display:none;}
+  .tipo-toggle input:checked + span{color:var(--accent);}
+  .tipo-toggle label:has(input:checked){
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+
+  .link-banner{
+    display:none;
+    background:var(--ok-soft);
+    border:1px solid var(--ok);
+    color:#25562F;
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:13.5px;
+    margin-top:8px;
+  }
+  .link-banner.show{display:block;}
+  .link-banner.error{
+    background:var(--danger-soft);
+    border-color:var(--danger);
+    color:#7A2E23;
+  }
+
+  /* ---- Áreas ---- */
+  .area-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .area-chip{
+    border:1.5px solid var(--line);
+    background:#fff;
+    border-radius:8px;
+    padding:11px 10px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+  }
+  .area-chip input{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;}
+  .area-chip.checked{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  .area-chip.custom-tag::after{
+    content:"custom";
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    color:var(--ink-soft);
+    margin-left:auto;
+  }
+
+  .add-area-row{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .add-area-row input{flex:1;}
+  .add-area-row button{
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:0 16px;
+    font-weight:600;
+    cursor:pointer;
+  }
+
+  .locked-note{
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13px;
+    margin-bottom:12px;
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+  }
+
+  .sticky-footer{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:var(--paper-card);
+    border-top:1px solid var(--line);
+    padding:12px 16px;
+    display:flex;
+    gap:10px;
+    max-width:640px;
+    margin:0 auto;
+  }
+  .top-nav{
+    background:none;border:none;color:#fff;
+    font-size:14px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;gap:6px;
+    padding:0;
+  }
+
+  /* ---- Cadastro corretor / Login ---- */
+  .auth-wrap{
+    max-width:420px;
+    margin:0 auto;
+    padding:32px 4px 60px;
+  }
+  .auth-logo{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .auth-logo .mark{
+    display:inline-flex;
+    width:52px;height:52px;
+    align-items:center;justify-content:center;
+    background:var(--ink);
+    color:var(--accent-soft);
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:15px;
+    border-radius:12px;
+    margin-bottom:10px;
+  }
+  .auth-logo h2{margin:0;font-size:18px;}
+  .auth-logo p{margin:4px 0 0;font-size:13px;color:var(--ink-soft);}
+  .auth-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 18px;
+  }
+  .auth-link-row{
+    text-align:center;
+    margin-top:14px;
+    font-size:13.5px;
+  }
+  .auth-link-row a{
+    color:var(--accent);
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .field-error{
+    color:var(--danger);
+    font-size:12.5px;
+    margin-top:5px;
+    display:none;
+  }
+  .field-error.show{display:block;}
+  .logout-row{
+    display:flex;
+    justify-content:flex-end;
+    gap:14px;
+    margin-bottom:10px;
+  }
+  .logout-row button{
+    background:none;border:none;
+    color:var(--ink-soft);
+    font-size:13px;font-weight:600;
+    cursor:pointer;
+  }
+  .espaco-box{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .espaco-box strong{color:var(--accent);}
+
+  /* ---- Itens por área (Etapa 2) ---- */
+  .itens-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px;}
+  .itens-header-title{font-size:15px;font-weight:600;}
+  .itens-header-title .sub{display:block;font-size:12px;color:var(--ink-soft);font-weight:400;margin-top:2px;}
+  .btn-edit-dados{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;white-space:nowrap;}
+
+  .area-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:18px;-webkit-overflow-scrolling:touch;}
+  .area-tab{flex-shrink:0;border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:8px 14px;font-size:13.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .area-tab.active{border-color:var(--accent);background:var(--accent);color:#fff;}
+  .area-tab .dot{width:7px;height:7px;border-radius:50%;background:var(--line);flex-shrink:0;}
+  .area-tab .dot.completo{background:var(--ok);}
+  .area-tab.active .dot{background:rgba(255,255,255,0.5);}
+  .area-tab.active .dot.completo{background:#fff;}
+
+  .item-card{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px;}
+  .item-card .item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .item-card .item-nome{font-weight:600;font-size:14.5px;}
+  .item-card .item-remove{background:none;border:none;color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;}
+
+  .estado-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;}
+  .estado-btn{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:8px 4px;font-size:12.5px;font-weight:600;text-align:center;cursor:pointer;color:var(--ink-soft);font-family:inherit;}
+  .estado-btn[data-estado="bom"].active{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);}
+  .estado-btn[data-estado="regular"].active{border-color:var(--warn);background:var(--warn-soft);color:var(--warn);}
+  .estado-btn[data-estado="ruim"].active{border-color:var(--danger);background:var(--danger-soft);color:var(--danger);}
+
+  .item-card textarea{margin-bottom:10px;}
+
+  .foto-slot{display:flex;align-items:center;gap:10px;}
+  .foto-thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--line);flex-shrink:0;background:#EDEFF0;}
+  .foto-placeholder{width:64px;height:64px;border-radius:8px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:22px;flex-shrink:0;}
+  .foto-slot .foto-btns{display:flex;flex-direction:column;gap:6px;flex:1;}
+  .foto-slot .foto-btns .btn{font-size:12.5px;padding:9px 6px;}
+  .foto-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .foto-obrigatoria-aviso{font-size:11.5px;color:var(--danger);font-weight:600;}
+
+  .fotos-complementares-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-bottom:10px;}
+  .foto-complementar-item{position:relative;}
+  .foto-complementar-item img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block;}
+  .foto-complementar-item .remove-x{position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;line-height:1;}
+
+  .add-item-row{display:flex;gap:8px;margin-bottom:22px;}
+  .add-item-row input{flex:1;}
+  .add-item-row button{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:0 16px;font-weight:600;cursor:pointer;}
+
+  .area-extra-block{margin-bottom:22px;}
+
+  .card-edit-icon{
+    background:none;border:none;color:var(--ink-soft);
+    font-size:13px;cursor:pointer;padding:2px 4px;
+  }
+
+  /* ---- Relatório (Etapa 3) ---- */
+  .rel-actionbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .rel-doc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px 18px;}
+
+  /* ---- Relatório paginado (páginas A4 desenhadas manualmente) ---- */
+  #relatorioConteudo{overflow-x:auto;padding-bottom:10px;}
+  .cpage{width:210mm;height:297mm;position:relative;background:#fff;margin:0 auto 8mm;box-shadow:0 3px 14px rgba(0,0,0,.2);overflow:hidden;}
+  .pg-bar{position:absolute;left:0;top:0;bottom:0;width:11mm;background:linear-gradient(180deg,#FFC746 0%,#FFC600 55%,#E5B600 100%);}
+  .pg-band{position:absolute;top:0;left:0;right:0;height:15mm;background:#D9D9D9;display:flex;align-items:center;justify-content:center;font-size:14px;letter-spacing:6px;color:#8F8F8F;z-index:2;}
+  .cover-band{position:absolute;top:8mm;left:0;right:0;background:#D9D9D9;box-shadow:0 1.5mm 2.5mm rgba(0,0,0,.28);padding:4mm 12mm;text-align:center;z-index:2;}
+  .cover-band .cb-small{font-size:11px;letter-spacing:3px;color:#5A5A5A;}
+  .cover-band .cb-title{font-size:20px;font-weight:700;color:#2C5F63;margin:1.5mm 0 1mm;}
+  .cover-band .cb-code{font-size:11.5px;color:#5A5A5A;}
+  .pg-content{position:absolute;top:21mm;left:23mm;right:13mm;height:245mm;overflow:hidden;}
+  .cpage-cover .pg-content{top:38mm;height:228mm;}
+  .pg-footer{position:absolute;left:0;right:0;bottom:0;height:22mm;background:#D9D9D9;color:#404040;}
+  .pg-footer .pgf-left{position:absolute;left:23mm;top:3mm;font-size:10.5px;line-height:1.55;}
+  .pg-footer .pgf-badge{position:absolute;right:9mm;top:-4mm;background:#A5A5A5;color:#fff;border-radius:1.5mm;padding:1.6mm 3.5mm;font-size:10.5px;text-align:center;line-height:1.35;box-shadow:0 1mm 1.5mm rgba(0,0,0,.25);}
+  .rb{margin-bottom:5mm;}
+  .rb-area{font-size:15px;font-weight:700;color:#2C5F63;border-bottom:2px solid #2C5F63;padding-bottom:1.5mm;margin:2mm 0 3mm;}
+  .rb-item{display:flex;gap:5mm;}
+  .rb-item img{width:40mm;height:40mm;object-fit:cover;border-radius:1.5mm;border:1px solid #D8DEE2;flex-shrink:0;}
+  .rb-semfoto{width:40mm;flex-shrink:0;font-size:10px;color:#A63D2F;}
+  .rb-item .rbi-nome{font-weight:700;font-size:12.5px;}
+  .rb-item .rbi-obs{font-size:11.5px;color:#333;margin-top:1mm;}
+  .rb-extras{background:#FBF0DC;border-radius:1.5mm;padding:2.5mm 3mm;font-size:11px;}
+  .rb-fotoscomp img{width:26mm;height:26mm;object-fit:cover;border-radius:1.5mm;border:1px solid #D8DEE2;margin:0 1.5mm 1.5mm 0;}
+  .cover-info{font-size:12px;margin-bottom:4mm;width:100%;border-collapse:collapse;}
+  .cover-info td{padding:1.2mm 0;}
+  .cover-info .lbl{color:#4B5566;width:38%;}
+  .cover-info .val{font-weight:600;}
+  .cover-corretor{font-size:10.5px;color:#4B5566;font-style:italic;margin:2mm 0 5mm;}
+  .cover-foto-lbl{text-align:center;font-size:10.5px;color:#4B5566;margin-bottom:1.5mm;}
+  .cover-foto{text-align:center;}
+  .cover-foto img{max-width:130mm;max-height:100mm;border-radius:1.5mm;border:1px solid #D8DEE2;}
+  .cover-vinculo{font-size:10.5px;background:#E4EEEE;border-radius:1.5mm;padding:2.5mm 3mm;margin-bottom:4mm;color:#2C5F63;}
+
+  @media print{
+    header.topbar, .rel-actionbar, .logout-row{display:none !important;}
+    body{background:#fff;margin:0;}
+    main{padding:0;max-width:none;margin:0;}
+    #relatorioConteudo{overflow:visible;padding:0;}
+    .cpage{margin:0;box-shadow:none;page-break-after:always;}
+    .cpage:last-child{page-break-after:auto;}
+    @page{ size:A4; margin:0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">CH</span>
+    <h1 id="headerTitle">Check House <span style="font-size:11px;font-weight:400;opacity:.7;">v1.0</span></h1>
+  </div>
+  <button class="top-nav" id="navBtn" style="display:none;" onclick="goHome()">← Vistorias</button>
+</header>
+
+<main>
+
+  <!-- ================= CADASTRO DO CORRETOR ================= -->
+  <section class="screen active" id="screen-cadastro">
+    <div class="auth-wrap">
+      <div class="auth-logo">
+        <div class="mark">CH</div>
+        <h2>Criar sua conta</h2>
+        <p>Cadastre seus dados profissionais para começar a usar o Check House.</p>
+      </div>
+      <div class="auth-card">
+        <div class="section-label">Dados profissionais</div>
+        <div class="field">
+          <label>Nome completo</label>
+          <input type="text" id="corNome">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>CRECI</label>
+            <input type="text" id="corCreci" placeholder="Ex: 123456-F">
+          </div>
+          <div class="field">
+            <label>Telefone</label>
+            <input type="text" id="corTelefone" placeholder="(00) 00000-0000" maxlength="16">
+          </div>
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="text" id="corEmail" placeholder="voce@email.com">
+        </div>
+        <div class="field">
+          <label>Endereço</label>
+          <input type="text" id="corEndereco">
+        </div>
+
+        <div class="section-label">Acesso ao sistema</div>
+        <div class="field">
+          <label>Nome de usuário</label>
+          <input type="text" id="corUsuario">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Senha</label>
+            <input type="password" id="corSenha">
+          </div>
+          <div class="field">
+            <label>Confirmar senha</label>
+            <input type="password" id="corSenhaConfirma">
+          </div>
+        </div>
+        <div class="field-error" id="cadastroErro"></div>
+
+        <button class="btn btn-primary btn-block" onclick="criarConta()">Criar conta e entrar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LOGIN ================= -->
+  <section class="screen" id="screen-login">
+    <div class="auth-wrap">
+      <div class="auth-logo">
+        <div class="mark">CH</div>
+        <h2 id="loginSaudacao">Bem-vindo de volta</h2>
+        <p>Entre com seu usuário e senha para acessar suas vistorias.</p>
+      </div>
+      <div class="auth-card">
+        <div class="field">
+          <label>Nome de usuário</label>
+          <input type="text" id="loginUsuario">
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="loginSenha">
+        </div>
+        <div class="field-error" id="loginErro"></div>
+        <button class="btn btn-primary btn-block" onclick="fazerLogin()">Entrar</button>
+        <div class="auth-link-row">
+          <a onclick="abrirRecuperarSenha()">Esqueci minha senha</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RECUPERAR SENHA ================= -->
+  <section class="screen" id="screen-recuperar">
+    <div class="auth-wrap">
+      <div class="auth-logo">
+        <div class="mark">CH</div>
+        <h2>Recuperar senha</h2>
+        <p>Informe o e-mail cadastrado na sua conta e enviaremos sua senha.</p>
+      </div>
+      <div class="auth-card">
+        <div class="field">
+          <label>E-mail cadastrado</label>
+          <input type="text" id="recuperarEmail" placeholder="voce@email.com">
+        </div>
+        <div class="field-error" id="recuperarErro"></div>
+        <div class="link-banner" id="recuperarSucesso">✓ E-mail enviado! Verifique sua caixa de entrada.</div>
+        <button class="btn btn-primary btn-block" id="btnRecuperar" onclick="enviarRecuperacaoSenha()">Enviar senha por e-mail</button>
+        <div class="auth-link-row">
+          <a onclick="showScreen('screen-login');document.getElementById('navBtn').style.display='none';">← Voltar para o login</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen" id="screen-home">
+    <div class="logout-row">
+      <button onclick="abrirConfiguracoes()">⚙ Configurações</button>
+      <button onclick="sair()">Sair (<span id="usuarioLogadoNome"></span>)</button>
+    </div>
+    <div class="home-actions" style="flex-wrap:wrap;gap:10px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="goNovaVistoria()">+ Nova vistoria</button>
+      <button class="btn btn-ghost" id="btnInstalarPWA" style="display:none;align-items:center;gap:6px;" onclick="instalarPWA()">📲 Instalar app</button>
+    </div>
+
+    <div id="listaVistorias"></div>
+  </section>
+
+  <!-- ================= CONFIGURAÇÕES ================= -->
+  <section class="screen" id="screen-config">
+    <div class="section-label">Seus dados profissionais</div>
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="cfgNome">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>CRECI</label>
+        <input type="text" id="cfgCreci">
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" id="cfgTelefone" maxlength="16">
+      </div>
+    </div>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="text" id="cfgEmail">
+    </div>
+    <div class="field">
+      <label>Endereço</label>
+      <input type="text" id="cfgEndereco">
+    </div>
+    <div class="field-error" id="cfgDadosErro"></div>
+    <button class="btn btn-primary btn-block" onclick="salvarDadosCorretor()">Salvar dados</button>
+
+    <div class="section-label" style="margin-top:30px;">Alterar senha</div>
+    <div class="row2">
+      <div class="field">
+        <label>Nova senha</label>
+        <input type="password" id="cfgNovaSenha" placeholder="Deixe em branco para manter">
+      </div>
+      <div class="field">
+        <label>Confirmar nova senha</label>
+        <input type="password" id="cfgNovaSenhaConfirma">
+      </div>
+    </div>
+    <div class="field-error" id="cfgSenhaErro"></div>
+    <button class="btn btn-ghost btn-block" onclick="salvarNovaSenha()">Atualizar senha</button>
+
+    <div class="section-label" style="margin-top:30px;">Armazenamento das fotos</div>
+    <div class="field">
+      <label>Onde salvar</label>
+      <select disabled>
+        <option>Neste dispositivo (padrão)</option>
+      </select>
+      <div class="hint">Integração com Google Drive será adicionada na versão Android do app.</div>
+    </div>
+    <div class="field">
+      <label>Qualidade das fotos</label>
+      <select id="configQualidade">
+        <option value="economia">Economizar espaço (recomendado neste navegador)</option>
+        <option value="padrao">Padrão</option>
+        <option value="alta">Alta qualidade (ocupa mais espaço)</option>
+      </select>
+      <div class="hint">Só vale para as próximas fotos tiradas — as já salvas não mudam.</div>
+    </div>
+
+    <div class="section-label">Espaço utilizado</div>
+    <div class="espaco-box" id="espacoInfo">Calculando...</div>
+  </section>
+
+  <!-- ================= NOVA VISTORIA ================= -->
+  <section class="screen" id="screen-form">
+
+    <div class="section-label">Identificação</div>
+
+    <div class="field">
+      <label>Código do imóvel</label>
+      <input type="text" id="codigoImovel" placeholder="Ex: IMV-014" class="mono">
+      <div class="hint">Esse código é o que vincula a vistoria de saída à de entrada. Use sempre o mesmo para o mesmo imóvel.</div>
+    </div>
+
+    <div class="field">
+      <label>Tipo de vistoria</label>
+      <div class="tipo-toggle">
+        <label><input type="radio" name="tipo" value="entrada" checked onchange="onTipoChange()"><span>Entrada</span></label>
+        <label><input type="radio" name="tipo" value="saida" onchange="onTipoChange()"><span>Saída</span></label>
+      </div>
+      <div class="link-banner" id="linkBanner"></div>
+    </div>
+
+    <div class="section-label">Dados gerais</div>
+
+    <div class="field">
+      <label>Proprietário</label>
+      <input type="text" id="proprietario">
+    </div>
+    <div class="field">
+      <label>Locatário</label>
+      <input type="text" id="locatario">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>CEP</label>
+        <input type="text" id="cep" placeholder="00000-000">
+      </div>
+      <div class="field">
+        <label>Tipo de imóvel</label>
+        <select id="tipoImovel">
+          <option value="casa">Casa</option>
+          <option value="apartamento">Apartamento</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Rua / Logradouro</label>
+      <input type="text" id="rua">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Número</label>
+        <input type="text" id="numero">
+      </div>
+      <div class="field">
+        <label>Complemento <span style="font-weight:400;color:var(--ink-soft);">(opcional)</span></label>
+        <input type="text" id="complemento" placeholder="Apto, bloco...">
+      </div>
+    </div>
+    <div class="field">
+      <label>Bairro</label>
+      <input type="text" id="bairro">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Cidade</label>
+        <input type="text" id="cidade">
+      </div>
+      <div class="field">
+        <label>Estado (UF)</label>
+        <input type="text" id="estado" maxlength="2" placeholder="Ex: SP" style="text-transform:uppercase;">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Valor da locação</label>
+        <input type="text" inputmode="numeric" id="valorLocacao" placeholder="R$ 0,00">
+      </div>
+      <div class="field">
+        <label>Data da vistoria</label>
+        <input type="date" id="dataVistoria">
+      </div>
+    </div>
+    <div class="field">
+      <label>Situação documental do imóvel</label>
+      <textarea id="situacaoDocumental" rows="2" placeholder="Ex: matrícula regularizada, contrato vigente..."></textarea>
+    </div>
+
+    <div class="section-label">Áreas do imóvel</div>
+    <div id="locked-note-areas"></div>
+
+    <div class="area-grid" id="areaGrid"></div>
+
+    <div class="add-area-row" id="addAreaRow">
+      <input type="text" id="novaAreaInput" placeholder="Adicionar área (ex: Escritório)">
+      <button onclick="adicionarAreaCustom()">Adicionar</button>
+    </div>
+
+  </section>
+
+  <!-- ================= ITENS POR ÁREA (ETAPA 2) ================= -->
+  <section class="screen" id="screen-itens">
+    <div class="itens-header">
+      <div class="itens-header-title" id="itensVistoriaTitulo"></div>
+      <button class="btn-edit-dados" onclick="editarDadosDaVistoriaAtual()">✎ Editar dados</button>
+    </div>
+
+    <div style="background:#FBF0DC;color:#7A5A0A;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:16px;">
+      ⚠️ Modo de teste: fotos ficam na memória do celular só enquanto essa aba estiver aberta. Gere o relatório antes de fechar ou recarregar a página.
+    </div>
+
+    <div class="area-extra-block">
+      <div class="section-label">Foto da frente da casa</div>
+      <div id="fotoFrenteSlot"></div>
+    </div>
+
+    <div class="area-tabs" id="areaTabs"></div>
+
+    <div id="itensLista"></div>
+
+    <div class="area-extra-block">
+      <div class="section-label">Observações novas nesta área</div>
+      <textarea id="obsNovasArea" rows="2" placeholder="Situações não previstas na lista de itens..."></textarea>
+    </div>
+
+    <div class="area-extra-block">
+      <div class="section-label">Fotos complementares desta área</div>
+      <div id="fotosComplementaresGrid" class="fotos-complementares-grid"></div>
+      <div class="foto-actions">
+        <label class="btn btn-ghost" style="cursor:pointer;text-align:center;">📷 Câmera
+          <input type="file" accept="image/*" capture="environment" id="inputFotoComplementarCamera" style="display:none;">
+        </label>
+        <label class="btn btn-ghost" style="cursor:pointer;text-align:center;">🖼️ Galeria
+          <input type="file" accept="image/*" id="inputFotoComplementarGaleria" style="display:none;">
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RELATÓRIO (ETAPA 3) ================= -->
+  <section class="screen" id="screen-relatorio">
+    <div class="rel-actionbar">
+      <button class="btn btn-ghost" onclick="abrirItens(currentVistoriaId)">← Voltar</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨️ Baixar PDF</button>
+      <button class="btn btn-primary" onclick="baixarWord()">📄 Word editável</button>
+    </div>
+    <div id="relatorioConteudo"></div>
+  </section>
+
+</main>
+
+<div class="sticky-footer" id="footerItens" style="display:none;">
+  <label class="btn btn-ghost" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">⇪ Importar Word
+    <input type="file" id="inputImportWord" accept=".docx" style="display:none;">
+  </label>
+  <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="abrirRelatorio(currentVistoriaId)">📄 Gerar relatório final</button>
+</div>
+
+<div class="sticky-footer" id="footerForm" style="display:none;">
+  <button class="btn btn-ghost" onclick="goHome()">Cancelar</button>
+  <button class="btn btn-primary" onclick="salvarVistoria()">Salvar e continuar →</button>
+</div>
+
+<script>
+/* ===================== CORRETOR / LOGIN ===================== */
+
+function getCorretor(){
+  return JSON.parse(localStorage.getItem('corretor') || 'null');
+}
+function saveCorretor(dados){
+  localStorage.setItem('corretor', JSON.stringify(dados));
+}
+function estaLogado(){
+  return localStorage.getItem('sessaoAtiva') === 'true';
+}
+
+function criarConta(){
+  const nome = document.getElementById('corNome').value.trim();
+  const creci = document.getElementById('corCreci').value.trim();
+  const telefone = document.getElementById('corTelefone').value.trim();
+  const email = document.getElementById('corEmail').value.trim();
+  const endereco = document.getElementById('corEndereco').value.trim();
+  const usuario = document.getElementById('corUsuario').value.trim();
+  const senha = document.getElementById('corSenha').value;
+  const senhaConfirma = document.getElementById('corSenhaConfirma').value;
+
+  const erroEl = document.getElementById('cadastroErro');
+  erroEl.classList.remove('show');
+
+  if(!nome || !creci || !email || !usuario || !senha){
+    erroEl.textContent = 'Preencha ao menos: nome, CRECI, e-mail, usuário e senha.';
+    erroEl.classList.add('show');
+    return;
+  }
+  if(senha !== senhaConfirma){
+    erroEl.textContent = 'As senhas não coincidem.';
+    erroEl.classList.add('show');
+    return;
+  }
+
+  saveCorretor({ nome, creci, telefone, email, endereco, usuario, senha });
+  localStorage.setItem('sessaoAtiva', 'true');
+  irParaHome();
+}
+
+function fazerLogin(){
+  const usuario = document.getElementById('loginUsuario').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  const erroEl = document.getElementById('loginErro');
+  erroEl.classList.remove('show');
+
+  const corretor = getCorretor();
+  if(!corretor || corretor.usuario !== usuario || corretor.senha !== senha){
+    erroEl.textContent = 'Usuário ou senha incorretos.';
+    erroEl.classList.add('show');
+    return;
+  }
+  localStorage.setItem('sessaoAtiva', 'true');
+  irParaHome();
+}
+
+function abrirRecuperarSenha(){
+  document.getElementById('recuperarEmail').value = '';
+  document.getElementById('recuperarErro').classList.remove('show');
+  document.getElementById('recuperarSucesso').classList.remove('show');
+  document.getElementById('btnRecuperar').disabled = false;
+  document.getElementById('btnRecuperar').textContent = 'Enviar senha por e-mail';
+  showScreen('screen-recuperar');
+}
+
+async function enviarRecuperacaoSenha(){
+  const emailDigitado = document.getElementById('recuperarEmail').value.trim().toLowerCase();
+  const erroEl = document.getElementById('recuperarErro');
+  const sucessoEl = document.getElementById('recuperarSucesso');
+  const btn = document.getElementById('btnRecuperar');
+  erroEl.classList.remove('show');
+  sucessoEl.classList.remove('show');
+
+  if(!emailDigitado){
+    erroEl.textContent = 'Digite o e-mail cadastrado na sua conta.';
+    erroEl.classList.add('show');
+    return;
+  }
+
+  const corretor = getCorretor();
+  if(!corretor || (corretor.email||'').toLowerCase() !== emailDigitado){
+    // Por segurança, mostramos a mesma mensagem de sucesso mesmo se o e-mail não bater
+    // (evita que alguém descubra se um e-mail está cadastrado ou não)
+    sucessoEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try{
+    await emailjs.send('service_jr50ice', 'template_hazuct8', {
+      to_email: corretor.email,
+      nome: corretor.nome,
+      senha: corretor.senha
+    });
+    sucessoEl.classList.add('show');
+  } catch(err){
+    console.error('EmailJS erro:', err);
+    const detalhe = err && err.text ? err.text : (err && err.status ? `Código ${err.status}` : String(err));
+    erroEl.textContent = `Erro ao enviar: ${detalhe}. Verifique sua conexão e tente novamente.`;
+    erroEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Enviar senha por e-mail';
+  }
+}
+
+function sair(){
+  localStorage.removeItem('sessaoAtiva');
+  document.getElementById('loginUsuario').value = '';
+  document.getElementById('loginSenha').value = '';
+  showScreen('screen-login');
+}
+
+function irParaHome(){
+  const corretor = getCorretor();
+  document.getElementById('usuarioLogadoNome').textContent = corretor ? corretor.nome.split(' ')[0] : '';
+  showScreen('screen-home');
+  renderListaVistorias();
+}
+
+function iniciarApp(){
+  const corretor = getCorretor();
+  if(!corretor){
+    showScreen('screen-cadastro');
+  } else if(estaLogado()){
+    irParaHome();
+  } else {
+    document.getElementById('loginSaudacao').textContent = 'Bem-vindo de volta, ' + corretor.nome.split(' ')[0];
+    showScreen('screen-login');
+  }
+}
+
+/* ===================== ESTADO / STORAGE ===================== */
+
+const AREAS_PADRAO = ["Sala","Cozinha","Lavanderia","Suíte 1","Suíte 2","Quarto","Banheiro social","Área externa","Garagem"];
+
+function getVistorias(){
+  return JSON.parse(localStorage.getItem('vistorias') || '[]');
+}
+function saveVistorias(list){
+  localStorage.setItem('vistorias', JSON.stringify(list));
+}
+function getAreasCustom(){
+  return JSON.parse(localStorage.getItem('areasCustom') || '[]');
+}
+function saveAreasCustom(list){
+  localStorage.setItem('areasCustom', JSON.stringify(list));
+}
+
+let areasSelecionadas = new Set(AREAS_PADRAO); // por padrão tudo marcado
+let areasLockedFromEntrada = null; // se for saída vinculada, guarda a lista travada
+let editingId = null; // se estiver editando uma vistoria existente, guarda o id dela
+let currentVistoriaId = null; // vistoria aberta na tela de itens
+let currentArea = null; // área selecionada na tela de itens
+
+/* ===================== NAVEGAÇÃO ===================== */
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome(){
+  showScreen('screen-home');
+  document.getElementById('navBtn').style.display='none';
+  document.getElementById('footerForm').style.display='none';
+  document.getElementById('footerItens').style.display='none';
+  document.getElementById('headerTitle').innerHTML = 'Check House <span style="font-size:11px;font-weight:400;opacity:.7;">v1.0</span>';
+  renderListaVistorias();
+}
+
+function goNovaVistoria(){
+  // reset do formulário
+  editingId = null;
+  document.getElementById('codigoImovel').value='';
+  document.getElementById('proprietario').value='';
+  document.getElementById('locatario').value='';
+  document.getElementById('tipoImovel').value='casa';
+  document.getElementById('cep').value='';
+  document.getElementById('rua').value='';
+  document.getElementById('numero').value='';
+  document.getElementById('complemento').value='';
+  document.getElementById('bairro').value='';
+  document.getElementById('cidade').value='';
+  document.getElementById('estado').value='';
+  document.getElementById('valorLocacao').value='';
+  document.getElementById('situacaoDocumental').value='';
+  document.getElementById('dataVistoria').valueAsDate = new Date();
+  document.querySelector('input[name=tipo][value=entrada]').checked = true;
+  areasSelecionadas = new Set(AREAS_PADRAO);
+  areasLockedFromEntrada = null;
+  document.getElementById('linkBanner').className = 'link-banner';
+  document.getElementById('addAreaRow').style.display = 'flex';
+  document.getElementById('locked-note-areas').innerHTML = '';
+  destravarCamposGerais();
+
+  renderAreaGrid();
+  showScreen('screen-form');
+  document.getElementById('navBtn').style.display='flex';
+  document.getElementById('footerForm').style.display='flex';
+  document.getElementById('footerItens').style.display='none';
+  document.getElementById('headerTitle').textContent = 'Nova vistoria';
+}
+
+function abrirVistoria(id){
+  const v = getVistorias().find(x=>x.id===id);
+  if(!v) return;
+  editingId = id;
+
+  document.getElementById('codigoImovel').value = v.codigo || '';
+  document.querySelector(`input[name=tipo][value="${v.tipo}"]`).checked = true;
+  document.getElementById('proprietario').value = v.proprietario || '';
+  document.getElementById('locatario').value = v.locatario || '';
+  document.getElementById('tipoImovel').value = v.tipoImovel || 'casa';
+  document.getElementById('cep').value = v.cep || '';
+  document.getElementById('rua').value = v.rua || '';
+  document.getElementById('numero').value = v.numero || '';
+  document.getElementById('complemento').value = v.complemento || '';
+  document.getElementById('bairro').value = v.bairro || '';
+  document.getElementById('cidade').value = v.cidade || '';
+  document.getElementById('estado').value = v.estado || '';
+  document.getElementById('valorLocacao').value = v.valorLocacao || '';
+  document.getElementById('situacaoDocumental').value = v.situacaoDocumental || '';
+  document.getElementById('dataVistoria').value = v.dataVistoria || '';
+
+  areasSelecionadas = new Set(v.areas || []);
+  destravarCamposGerais();
+
+  if(v.tipo === 'saida'){
+    tentarVincularEntrada(); // relocaliza a entrada, trava campos e áreas de novo
+  } else {
+    areasLockedFromEntrada = null;
+    document.getElementById('linkBanner').className = 'link-banner';
+    document.getElementById('addAreaRow').style.display = 'flex';
+    document.getElementById('locked-note-areas').innerHTML = '';
+    renderAreaGrid();
+  }
+
+  showScreen('screen-form');
+  document.getElementById('navBtn').style.display='flex';
+  document.getElementById('footerForm').style.display='flex';
+  document.getElementById('footerItens').style.display='none';
+  document.getElementById('headerTitle').textContent = 'Editar vistoria';
+}
+
+/* ===================== TIPO ENTRADA / SAÍDA ===================== */
+
+function onTipoChange(){
+  const tipo = document.querySelector('input[name=tipo]:checked').value;
+  if(tipo === 'saida'){
+    tentarVincularEntrada();
+  } else {
+    areasLockedFromEntrada = null;
+    document.getElementById('linkBanner').className = 'link-banner';
+    document.getElementById('addAreaRow').style.display = 'flex';
+    document.getElementById('locked-note-areas').innerHTML = '';
+    areasSelecionadas = new Set(AREAS_PADRAO);
+    renderAreaGrid();
+  }
+}
+
+const CAMPOS_HERDADOS = ['proprietario','locatario','tipoImovel','cep','rua','numero','complemento','bairro','cidade','estado','valorLocacao','situacaoDocumental'];
+
+/* ===================== MÁSCARAS DE FORMATAÇÃO ===================== */
+
+function formatarTelefoneInput(valor){
+  const d = valor.replace(/\D/g,'').slice(0,11);
+  const len = d.length;
+  if(len === 0) return '';
+  if(len <= 2) return `(${d}`;
+  if(len <= 6) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if(len <= 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7,11)}`;
+}
+
+function formatarMoedaInput(valor){
+  const digitos = valor.replace(/\D/g,'');
+  if(!digitos) return '';
+  const numero = parseInt(digitos, 10) / 100;
+  return numero.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+
+document.getElementById('corTelefone').addEventListener('input', e=>{
+  e.target.value = formatarTelefoneInput(e.target.value);
+});
+document.getElementById('valorLocacao').addEventListener('input', e=>{
+  e.target.value = formatarMoedaInput(e.target.value);
+});
+
+function travarCamposGerais(entrada){
+  CAMPOS_HERDADOS.forEach(id=>{
+    const el = document.getElementById(id);
+    el.value = entrada[id] || '';
+    el.disabled = true;
+  });
+}
+function destravarCamposGerais(){
+  CAMPOS_HERDADOS.forEach(id=>{
+    document.getElementById(id).disabled = false;
+  });
+}
+
+function tentarVincularEntrada(){
+  const codigo = document.getElementById('codigoImovel').value.trim();
+  const banner = document.getElementById('linkBanner');
+  if(!codigo){
+    banner.className = 'link-banner error show';
+    banner.textContent = 'Informe primeiro o código do imóvel para localizar a vistoria de entrada.';
+    areasLockedFromEntrada = null;
+    document.getElementById('addAreaRow').style.display = 'flex';
+    document.getElementById('locked-note-areas').innerHTML = '';
+    destravarCamposGerais();
+    renderAreaGrid();
+    return;
+  }
+  const vistorias = getVistorias();
+  const entrada = vistorias.find(v => v.codigo === codigo && v.tipo === 'entrada');
+  if(entrada){
+    banner.className = 'link-banner show';
+    banner.textContent = `Vinculada à vistoria de entrada de ${entrada.dataVistoria} — dados gerais e as ${entrada.areas.length} áreas foram carregados automaticamente.`;
+    areasLockedFromEntrada = entrada.areas.slice();
+    areasSelecionadas = new Set(entrada.areas);
+    document.getElementById('addAreaRow').style.display = 'none';
+    document.getElementById('locked-note-areas').innerHTML =
+      '<div class="locked-note">🔒 As áreas abaixo vieram da vistoria de entrada e não podem ser removidas aqui — na próxima etapa você poderá adicionar observações e fotos complementares por área.</div>';
+    travarCamposGerais(entrada);
+  } else {
+    banner.className = 'link-banner error show';
+    banner.textContent = `Nenhuma vistoria de entrada encontrada com o código "${codigo}". Verifique o código ou cadastre a entrada primeiro.`;
+    areasLockedFromEntrada = null;
+    document.getElementById('addAreaRow').style.display = 'flex';
+    document.getElementById('locked-note-areas').innerHTML = '';
+    destravarCamposGerais();
+  }
+  renderAreaGrid();
+}
+
+document.getElementById('codigoImovel').addEventListener('blur', ()=>{
+  const tipo = document.querySelector('input[name=tipo]:checked').value;
+  if(tipo === 'saida') tentarVincularEntrada();
+});
+
+/* ===================== ÁREAS ===================== */
+
+function renderAreaGrid(){
+  const grid = document.getElementById('areaGrid');
+  grid.innerHTML = '';
+  const custom = getAreasCustom();
+  const todasAreas = [...AREAS_PADRAO, ...custom.filter(a=>!AREAS_PADRAO.includes(a))];
+
+  todasAreas.forEach(area=>{
+    const isCustom = !AREAS_PADRAO.includes(area);
+    const checked = areasSelecionadas.has(area);
+    const locked = areasLockedFromEntrada !== null;
+    if(locked && !areasLockedFromEntrada.includes(area)) return; // só mostra as travadas
+
+    const label = document.createElement('label');
+    label.className = 'area-chip' + (checked?' checked':'') + (isCustom?' custom-tag':'');
+    label.innerHTML = `<input type="checkbox" ${checked?'checked':''} ${locked?'disabled':''}> <span>${area}</span>`;
+    if(!locked){
+      label.querySelector('input').addEventListener('change', (e)=>{
+        if(e.target.checked) areasSelecionadas.add(area);
+        else areasSelecionadas.delete(area);
+        label.classList.toggle('checked', e.target.checked);
+      });
+    }
+    grid.appendChild(label);
+  });
+}
+
+function adicionarAreaCustom(){
+  const input = document.getElementById('novaAreaInput');
+  const nome = input.value.trim();
+  if(!nome) return;
+  const custom = getAreasCustom();
+  if(!custom.includes(nome) && !AREAS_PADRAO.includes(nome)){
+    custom.push(nome);
+    saveAreasCustom(custom);
+  }
+  areasSelecionadas.add(nome);
+  input.value = '';
+  renderAreaGrid();
+}
+
+/* ===================== SALVAR ===================== */
+
+function salvarVistoria(){
+  const codigo = document.getElementById('codigoImovel').value.trim();
+  const tipo = document.querySelector('input[name=tipo]:checked').value;
+  const rua = document.getElementById('rua').value.trim();
+  const numero = document.getElementById('numero').value.trim();
+  const bairro = document.getElementById('bairro').value.trim();
+  const cidade = document.getElementById('cidade').value.trim();
+  const estado = document.getElementById('estado').value.trim().toUpperCase();
+  const cep = document.getElementById('cep').value.trim();
+  const complemento = document.getElementById('complemento').value.trim();
+  const tipoImovel = document.getElementById('tipoImovel').value;
+
+  if(!codigo || !rua || !numero || !bairro || !cidade || !estado){
+    alert('Preencha ao menos: código do imóvel, rua, número, bairro, cidade e estado.');
+    return;
+  }
+  if(tipo === 'saida' && !areasLockedFromEntrada){
+    alert('Não foi possível vincular esta saída a uma vistoria de entrada. Confira o código do imóvel.');
+    return;
+  }
+
+  const vistorias = getVistorias();
+
+  // impede duplicar entrada com mesmo código (mas não se estiver editando a própria)
+  if(!editingId && tipo === 'entrada' && vistorias.some(v=>v.codigo===codigo && v.tipo==='entrada')){
+    if(!confirm('Já existe uma vistoria de ENTRADA com esse código. Deseja substituir os dados gerais dela?')){
+      return;
+    }
+  }
+
+  const enderecoResumo = `${rua}, ${numero}${complemento ? ' - '+complemento : ''} - ${bairro}, ${cidade}/${estado}`;
+
+  const dados = {
+    codigo,
+    tipo,
+    tipoImovel,
+    proprietario: document.getElementById('proprietario').value.trim(),
+    locatario: document.getElementById('locatario').value.trim(),
+    cep, rua, numero, complemento, bairro, cidade, estado,
+    enderecoResumo,
+    valorLocacao: document.getElementById('valorLocacao').value,
+    dataVistoria: document.getElementById('dataVistoria').value,
+    situacaoDocumental: document.getElementById('situacaoDocumental').value.trim(),
+    areas: Array.from(areasSelecionadas)
+  };
+
+  let finalId;
+  if(editingId){
+    const idx = vistorias.findIndex(v=>v.id===editingId);
+    if(idx > -1){
+      vistorias[idx] = { ...vistorias[idx], ...dados };
+      finalId = vistorias[idx].id;
+    }
+  } else {
+    finalId = Date.now().toString(36);
+    vistorias.push({ id: finalId, criadaEm: new Date().toISOString(), ...dados });
+  }
+
+  saveVistorias(vistorias);
+  abrirItens(finalId);
+}
+
+/* ===================== LISTA HOME ===================== */
+
+function renderListaVistorias(){
+  const wrap = document.getElementById('listaVistorias');
+  const vistorias = getVistorias().sort((a,b)=> b.criadaEm.localeCompare(a.criadaEm));
+  if(vistorias.length === 0){
+    wrap.innerHTML = `<div class="empty-state"><strong>Nenhuma vistoria cadastrada ainda</strong>Toque em "Nova vistoria" para começar.</div>`;
+    return;
+  }
+  wrap.innerHTML = '';
+  vistorias.forEach(v=>{
+    const card = document.createElement('div');
+    card.className = 'vistoria-card' + (v.tipo==='saida' ? ' tipo-saida' : '');
+    card.innerHTML = `
+      <div class="row1">
+        <div class="endereco">${v.enderecoResumo || '(sem endereço)'}</div>
+        <span class="tag ${v.tipo==='entrada'?'tag-entrada':'tag-saida'}">${v.tipo}</span>
+      </div>
+      <div class="meta mono">${v.codigo} · ${(v.areas||[]).length} áreas · ${v.dataVistoria || 'sem data'}</div>
+      <div class="meta"><button class="card-edit-icon" data-edit-id="${v.id}">✎ Editar dados gerais</button></div>
+    `;
+    card.addEventListener('click', ()=>abrirItens(v.id));
+    card.querySelector('[data-edit-id]').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      abrirVistoria(v.id);
+    });
+    wrap.appendChild(card);
+  });
+}
+
+/* ===================== BANCO DE FOTOS (memória RAM da sessão) ===================== */
+/* Guardamos as fotos na RAM enquanto o app está aberto — evita a cota minúscula que
+   o navegador dá a um arquivo local. Atenção: isso significa que fotos ainda não
+   incluídas num relatório exportado se perdem se a aba for fechada ou recarregada.
+   Quando o app virar um aplicativo Android instalado, isso passa a usar o
+   armazenamento real do aparelho. */
+
+const fotosMemoria = new Map();
+
+function salvarFotoDB(id, dataUrl){
+  fotosMemoria.set(id, dataUrl);
+  return Promise.resolve();
+}
+function obterFotoDB(id){
+  return Promise.resolve(fotosMemoria.get(id) || null);
+}
+function excluirFotoDB(id){
+  fotosMemoria.delete(id);
+  return Promise.resolve();
+}
+
+// Reduz o tamanho da foto (evita estourar o armazenamento com muitas fotos em alta resolução)
+const PRESETS_QUALIDADE = {
+  economia: { maxW:700,  q:0.55 },
+  padrao:   { maxW:1000, q:0.72 },
+  alta:     { maxW:1400, q:0.85 }
+};
+function getConfig(){
+  return JSON.parse(localStorage.getItem('configApp') || '{"qualidadeFoto":"economia"}');
+}
+function saveConfig(cfg){
+  localStorage.setItem('configApp', JSON.stringify(cfg));
+}
+function comprimirImagem(file){
+  const preset = PRESETS_QUALIDADE[getConfig().qualidadeFoto] || PRESETS_QUALIDADE.economia;
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const scale = Math.min(1, preset.maxW / img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', preset.q));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function abrirConfiguracoes(){
+  const corretor = getCorretor() || {};
+  document.getElementById('cfgNome').value = corretor.nome || '';
+  document.getElementById('cfgCreci').value = corretor.creci || '';
+  document.getElementById('cfgTelefone').value = corretor.telefone || '';
+  document.getElementById('cfgEmail').value = corretor.email || '';
+  document.getElementById('cfgEndereco').value = corretor.endereco || '';
+  document.getElementById('cfgDadosErro').classList.remove('show');
+  document.getElementById('cfgNovaSenha').value = '';
+  document.getElementById('cfgNovaSenhaConfirma').value = '';
+  document.getElementById('cfgSenhaErro').classList.remove('show');
+
+  document.getElementById('configQualidade').value = getConfig().qualidadeFoto;
+  atualizarEspacoInfo();
+  showScreen('screen-config');
+  document.getElementById('navBtn').style.display = 'flex';
+  document.getElementById('footerForm').style.display = 'none';
+  document.getElementById('footerItens').style.display = 'none';
+  document.getElementById('headerTitle').textContent = 'Configurações';
+}
+
+function salvarDadosCorretor(){
+  const nome = document.getElementById('cfgNome').value.trim();
+  const creci = document.getElementById('cfgCreci').value.trim();
+  const telefone = document.getElementById('cfgTelefone').value.trim();
+  const email = document.getElementById('cfgEmail').value.trim();
+  const endereco = document.getElementById('cfgEndereco').value.trim();
+  const erroEl = document.getElementById('cfgDadosErro');
+  erroEl.classList.remove('show');
+
+  if(!nome || !creci || !email){
+    erroEl.textContent = 'Preencha ao menos: nome, CRECI e e-mail.';
+    erroEl.classList.add('show');
+    return;
+  }
+
+  const corretor = getCorretor() || {};
+  corretor.nome = nome;
+  corretor.creci = creci;
+  corretor.telefone = telefone;
+  corretor.email = email;
+  corretor.endereco = endereco;
+  saveCorretor(corretor);
+  document.getElementById('usuarioLogadoNome').textContent = nome.split(' ')[0];
+  alert('Dados atualizados com sucesso.');
+}
+
+function salvarNovaSenha(){
+  const novaSenha = document.getElementById('cfgNovaSenha').value;
+  const confirma = document.getElementById('cfgNovaSenhaConfirma').value;
+  const erroEl = document.getElementById('cfgSenhaErro');
+  erroEl.classList.remove('show');
+
+  if(!novaSenha){
+    erroEl.textContent = 'Digite a nova senha nos dois campos para atualizar.';
+    erroEl.classList.add('show');
+    return;
+  }
+  if(novaSenha !== confirma){
+    erroEl.textContent = 'As senhas não coincidem.';
+    erroEl.classList.add('show');
+    return;
+  }
+
+  const corretor = getCorretor();
+  corretor.senha = novaSenha;
+  saveCorretor(corretor);
+  document.getElementById('cfgNovaSenha').value = '';
+  document.getElementById('cfgNovaSenhaConfirma').value = '';
+  alert('Senha atualizada com sucesso.');
+}
+
+document.getElementById('cfgTelefone').addEventListener('input', e=>{
+  e.target.value = formatarTelefoneInput(e.target.value);
+});
+
+function atualizarEspacoInfo(){
+  const el = document.getElementById('espacoInfo');
+  let totalBytes = 0;
+  fotosMemoria.forEach(dataUrl => { totalBytes += dataUrl.length; });
+  const totalMB = (totalBytes/1024/1024).toFixed(1);
+  el.innerHTML = `<strong>${fotosMemoria.size} foto(s)</strong> carregadas nesta sessão, usando aproximadamente <strong>${totalMB} MB</strong> de memória RAM do celular.<br><br>⚠️ Modo de teste: essas fotos ficam só na memória enquanto o app está aberto. Gere o relatório (PDF/Word) antes de fechar a aba ou recarregar a página, senão as fotos ainda não exportadas se perdem.`;
+}
+
+
+/* ===================== ITENS SUGERIDOS POR ÁREA ===================== */
+
+const ITENS_SUGERIDOS = {
+  default:   ["Piso","Paredes","Teto","Portas","Tomadas e interruptores"],
+  sala:      ["Piso","Paredes","Teto","Janelas","Portas","Tomadas e interruptores","Iluminação"],
+  cozinha:   ["Piso","Paredes","Teto","Pia/Bancada","Armários","Torneira","Tomadas e interruptores","Iluminação"],
+  lavanderia:["Piso","Paredes","Teto","Tanque","Torneira","Ponto de água/esgoto"],
+  banheiro:  ["Piso","Paredes","Teto","Vaso sanitário","Pia","Box/Chuveiro","Torneiras","Ventilação"],
+  suite:     ["Piso","Paredes","Teto","Janelas","Portas","Tomadas e interruptores","Armário embutido"],
+  quarto:    ["Piso","Paredes","Teto","Janelas","Portas","Tomadas e interruptores","Armário embutido"],
+  externa:   ["Piso","Muros/Grades","Portão","Iluminação externa"],
+  garagem:   ["Piso","Portão","Iluminação"]
+};
+
+function getItensSugeridos(nomeArea){
+  const n = nomeArea.toLowerCase();
+  if(n.includes('cozinha')) return ITENS_SUGERIDOS.cozinha;
+  if(n.includes('lavanderia')) return ITENS_SUGERIDOS.lavanderia;
+  if(n.includes('banheiro')) return ITENS_SUGERIDOS.banheiro;
+  if(n.includes('suíte') || n.includes('suite')) return ITENS_SUGERIDOS.suite;
+  if(n.includes('quarto')) return ITENS_SUGERIDOS.quarto;
+  if(n.includes('externa') || n.includes('quintal') || n.includes('varanda')) return ITENS_SUGERIDOS.externa;
+  if(n.includes('garagem')) return ITENS_SUGERIDOS.garagem;
+  if(n.includes('sala')) return ITENS_SUGERIDOS.sala;
+  return ITENS_SUGERIDOS.default;
+}
+
+function novoIdInterno(){
+  return 'id_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+/* ===================== MONTAGEM DOS ITENS DA VISTORIA ===================== */
+
+function inicializarItensSeNecessario(vistoria){
+  vistoria.itensPorArea = vistoria.itensPorArea || {};
+  vistoria.areaExtras = vistoria.areaExtras || {};
+  let mudou = false;
+
+  let entradaRef = null;
+  if(vistoria.tipo === 'saida'){
+    entradaRef = getVistorias().find(v => v.codigo === vistoria.codigo && v.tipo === 'entrada');
+  }
+
+  (vistoria.areas || []).forEach(area=>{
+    if(!vistoria.itensPorArea[area]){
+      mudou = true;
+      if(entradaRef && entradaRef.itensPorArea && entradaRef.itensPorArea[area]){
+        // Saída herda exatamente os mesmos "espaços" de itens/fotos da entrada
+        vistoria.itensPorArea[area] = entradaRef.itensPorArea[area].map(it => ({
+          id: it.id, nome: it.nome, custom: it.custom,
+          estado:'', observacao:'', fotoId:null
+        }));
+      } else {
+        vistoria.itensPorArea[area] = getItensSugeridos(area).map(nome => ({
+          id: novoIdInterno(), nome, custom:false, estado:'', observacao:'', fotoId:null
+        }));
+      }
+    }
+    if(!vistoria.areaExtras[area]){
+      mudou = true;
+      vistoria.areaExtras[area] = { observacoesNovas:'', fotosComplementares:[] };
+    }
+  });
+
+  if(mudou) atualizarVistoriaNoStorage(vistoria);
+  return vistoria;
+}
+
+function atualizarVistoriaNoStorage(vistoria){
+  const todas = getVistorias();
+  const idx = todas.findIndex(v=>v.id===vistoria.id);
+  if(idx > -1){ todas[idx] = vistoria; saveVistorias(todas); }
+}
+
+function editarDadosDaVistoriaAtual(){
+  abrirVistoria(currentVistoriaId);
+}
+
+function areaEstaCompleta(vistoria, area){
+  const itens = vistoria.itensPorArea[area] || [];
+  return itens.length > 0 && itens.every(it => it.fotoId);
+}
+
+/* ===================== TELA DE ITENS ===================== */
+
+function abrirItens(id){
+  let vistoria = getVistorias().find(v=>v.id===id);
+  if(!vistoria) return;
+  vistoria = inicializarItensSeNecessario(vistoria);
+
+  currentVistoriaId = id;
+  currentArea = vistoria.areas[0];
+
+  document.getElementById('itensVistoriaTitulo').innerHTML =
+    `${vistoria.enderecoResumo || vistoria.codigo}<span class="sub">${vistoria.tipo.toUpperCase()} · ${vistoria.codigo}</span>`;
+
+  renderFotoFrente(vistoria);
+  renderAreaTabs(vistoria);
+  renderItensDaArea(vistoria);
+
+  showScreen('screen-itens');
+  document.getElementById('navBtn').style.display = 'flex';
+  document.getElementById('footerForm').style.display = 'none';
+  document.getElementById('footerItens').style.display = 'flex';
+  document.getElementById('headerTitle').textContent = 'Vistoria em andamento';
+}
+
+function renderFotoFrente(vistoria){
+  const slot = document.getElementById('fotoFrenteSlot');
+  slot.innerHTML = '';
+
+  const fotoSlot = document.createElement('div');
+  fotoSlot.className = 'foto-slot';
+
+  const imgHolder = document.createElement('div');
+  if(vistoria.fotoFrenteId){
+    const img = document.createElement('img');
+    img.className = 'foto-thumb';
+    img.style.width = '96px';
+    img.style.height = '96px';
+    obterFotoDB(vistoria.fotoFrenteId).then(url=>{ if(url) img.src = url; });
+    imgHolder.appendChild(img);
+  } else {
+    const ph = document.createElement('div');
+    ph.className = 'foto-placeholder';
+    ph.style.width = '96px';
+    ph.style.height = '96px';
+    ph.textContent = '🏠';
+    imgHolder.appendChild(ph);
+  }
+  fotoSlot.appendChild(imgHolder);
+
+  const btnsWrap = document.createElement('div');
+  btnsWrap.className = 'foto-btns';
+
+  const processarFotoFrente = async (file)=>{
+    if(!file) return;
+    try{
+      const dataUrl = await comprimirImagem(file);
+      const fotoId = vistoria.fotoFrenteId || novoIdInterno();
+      await salvarFotoDB(fotoId, dataUrl);
+      const v = getVistorias().find(x=>x.id===currentVistoriaId);
+      v.fotoFrenteId = fotoId;
+      atualizarVistoriaNoStorage(v);
+      renderFotoFrente(v);
+    } catch(err){
+      console.error(err);
+      alert('Não foi possível salvar essa foto. Tente novamente.');
+    }
+  };
+
+  function criarLabelFotoFrente(texto, usarCamera){
+    const label = document.createElement('label');
+    label.className = 'btn btn-ghost';
+    label.style.cursor = 'pointer';
+    label.style.textAlign = 'center';
+    label.style.display = 'block';
+    label.textContent = texto;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    if(usarCamera) input.capture = 'environment';
+    input.style.display = 'none';
+    input.addEventListener('change', e=>processarFotoFrente(e.target.files[0]));
+    label.appendChild(input);
+    return label;
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'foto-actions';
+  actions.appendChild(criarLabelFotoFrente('📷 Câmera', true));
+  actions.appendChild(criarLabelFotoFrente('🖼️ Galeria', false));
+  btnsWrap.appendChild(actions);
+
+  if(!vistoria.fotoFrenteId){
+    const aviso = document.createElement('div');
+    aviso.className = 'foto-obrigatoria-aviso';
+    aviso.textContent = 'Aparece na capa do relatório';
+    btnsWrap.appendChild(aviso);
+  }
+  fotoSlot.appendChild(btnsWrap);
+  slot.appendChild(fotoSlot);
+}
+
+function renderAreaTabs(vistoria){
+  const wrap = document.getElementById('areaTabs');
+  wrap.innerHTML = '';
+  vistoria.areas.forEach(area=>{
+    const btn = document.createElement('button');
+    btn.className = 'area-tab' + (area === currentArea ? ' active' : '');
+    const completo = areaEstaCompleta(vistoria, area);
+    btn.innerHTML = `<span class="dot ${completo ? 'completo' : ''}"></span> ${area}`;
+    btn.addEventListener('click', ()=>{
+      currentArea = area;
+      const v = getVistorias().find(x=>x.id===currentVistoriaId);
+      renderAreaTabs(v);
+      renderItensDaArea(v);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function renderItensDaArea(vistoria){
+  const area = currentArea;
+  const lista = document.getElementById('itensLista');
+  lista.innerHTML = '';
+  const itens = vistoria.itensPorArea[area] || [];
+
+  itens.forEach(item=>{
+    lista.appendChild(criarItemCard(area, item));
+  });
+
+  const addRow = document.createElement('div');
+  addRow.className = 'add-item-row';
+  const addInput = document.createElement('input');
+  addInput.type = 'text';
+  addInput.placeholder = 'Adicionar item (ex: Rodapé)';
+  const addBtn = document.createElement('button');
+  addBtn.textContent = 'Adicionar';
+  addBtn.addEventListener('click', ()=>{
+    const val = addInput.value.trim();
+    if(!val) return;
+    const v = getVistorias().find(x=>x.id===currentVistoriaId);
+    v.itensPorArea[area].push({ id: novoIdInterno(), nome: val, custom:true, estado:'', observacao:'', fotoId:null });
+    atualizarVistoriaNoStorage(v);
+    renderAreaTabs(v);
+    renderItensDaArea(v);
+  });
+  addRow.appendChild(addInput);
+  addRow.appendChild(addBtn);
+  lista.appendChild(addRow);
+
+  const extras = vistoria.areaExtras[area] || { observacoesNovas:'', fotosComplementares:[] };
+  const obsEl = document.getElementById('obsNovasArea');
+  obsEl.value = extras.observacoesNovas || '';
+  obsEl.oninput = ()=>{
+    const v = getVistorias().find(x=>x.id===currentVistoriaId);
+    v.areaExtras[area].observacoesNovas = obsEl.value;
+    atualizarVistoriaNoStorage(v);
+  };
+
+  renderFotosComplementares(vistoria, area);
+}
+
+function criarItemCard(area, item){
+  const card = document.createElement('div');
+  card.className = 'item-card';
+
+  const head = document.createElement('div');
+  head.className = 'item-head';
+  const nomeSpan = document.createElement('span');
+  nomeSpan.className = 'item-nome';
+  nomeSpan.textContent = item.nome;
+  head.appendChild(nomeSpan);
+  if(item.custom){
+    const rm = document.createElement('button');
+    rm.className = 'item-remove';
+    rm.textContent = 'Remover';
+    rm.addEventListener('click', ()=>{
+      const v = getVistorias().find(x=>x.id===currentVistoriaId);
+      if(item.fotoId) excluirFotoDB(item.fotoId);
+      v.itensPorArea[area] = v.itensPorArea[area].filter(it=>it.id !== item.id);
+      atualizarVistoriaNoStorage(v);
+      renderAreaTabs(v);
+      renderItensDaArea(v);
+    });
+    head.appendChild(rm);
+  }
+  card.appendChild(head);
+
+  const estadoWrap = document.createElement('div');
+  estadoWrap.className = 'estado-toggle';
+  [['bom','Bom'],['regular','Regular'],['ruim','Ruim']].forEach(([valor,label])=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'estado-btn' + (item.estado===valor ? ' active' : '');
+    b.dataset.estado = valor;
+    b.textContent = label;
+    b.addEventListener('click', ()=>{
+      const v = getVistorias().find(x=>x.id===currentVistoriaId);
+      const it = v.itensPorArea[area].find(i=>i.id===item.id);
+      it.estado = valor;
+      atualizarVistoriaNoStorage(v);
+      renderItensDaArea(v);
+    });
+    estadoWrap.appendChild(b);
+  });
+  card.appendChild(estadoWrap);
+
+  const obs = document.createElement('textarea');
+  obs.rows = 2;
+  obs.placeholder = 'Observações sobre este item...';
+  obs.value = item.observacao || '';
+  obs.addEventListener('input', ()=>{
+    const v = getVistorias().find(x=>x.id===currentVistoriaId);
+    const it = v.itensPorArea[area].find(i=>i.id===item.id);
+    it.observacao = obs.value;
+    atualizarVistoriaNoStorage(v);
+  });
+  card.appendChild(obs);
+
+  const fotoSlot = document.createElement('div');
+  fotoSlot.className = 'foto-slot';
+
+  const imgHolder = document.createElement('div');
+  if(item.fotoId){
+    const img = document.createElement('img');
+    img.className = 'foto-thumb';
+    obterFotoDB(item.fotoId).then(url=>{ if(url) img.src = url; });
+    imgHolder.appendChild(img);
+  } else {
+    const ph = document.createElement('div');
+    ph.className = 'foto-placeholder';
+    ph.textContent = '📷';
+    imgHolder.appendChild(ph);
+  }
+  fotoSlot.appendChild(imgHolder);
+
+  const btnsWrap = document.createElement('div');
+  btnsWrap.className = 'foto-btns';
+
+  const processarFotoItem = async (file)=>{
+    if(!file) return;
+    try{
+      const dataUrl = await comprimirImagem(file);
+      const fotoId = item.fotoId || novoIdInterno();
+      await salvarFotoDB(fotoId, dataUrl);
+      const v = getVistorias().find(x=>x.id===currentVistoriaId);
+      const it = v.itensPorArea[area].find(i=>i.id===item.id);
+      it.fotoId = fotoId;
+      atualizarVistoriaNoStorage(v);
+      renderAreaTabs(v);
+      renderItensDaArea(v);
+    } catch(err){
+      console.error(err);
+      alert('Não foi possível salvar essa foto: o armazenamento deste navegador está cheio.\n\nTente: ir em Configurações e reduzir a qualidade das fotos, ou apagar vistorias antigas de teste.');
+    }
+  };
+
+  function criarLabelFoto(texto, usarCamera){
+    const label = document.createElement('label');
+    label.className = 'btn btn-ghost';
+    label.style.cursor = 'pointer';
+    label.style.textAlign = 'center';
+    label.style.display = 'block';
+    label.textContent = texto;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    if(usarCamera) input.capture = 'environment';
+    input.style.display = 'none';
+    input.addEventListener('change', e=>processarFotoItem(e.target.files[0]));
+    label.appendChild(input);
+    return label;
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'foto-actions';
+  actions.appendChild(criarLabelFoto('📷 Câmera', true));
+  actions.appendChild(criarLabelFoto('🖼️ Galeria', false));
+  btnsWrap.appendChild(actions);
+
+  if(item.fotoId){
+    const trocarLabel = document.createElement('div');
+    trocarLabel.style.cssText = 'font-size:11.5px;color:var(--ink-soft);text-align:center;';
+    trocarLabel.textContent = 'Toque para trocar a foto';
+    btnsWrap.appendChild(trocarLabel);
+  } else {
+    const aviso = document.createElement('div');
+    aviso.className = 'foto-obrigatoria-aviso';
+    aviso.textContent = 'Foto obrigatória';
+    btnsWrap.appendChild(aviso);
+  }
+  fotoSlot.appendChild(btnsWrap);
+  card.appendChild(fotoSlot);
+
+  return card;
+}
+
+function renderFotosComplementares(vistoria, area){
+  const grid = document.getElementById('fotosComplementaresGrid');
+  grid.innerHTML = '';
+  const lista = (vistoria.areaExtras[area] || {}).fotosComplementares || [];
+  lista.forEach(fotoId=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'foto-complementar-item';
+    const img = document.createElement('img');
+    obterFotoDB(fotoId).then(url=>{ if(url) img.src = url; });
+    wrap.appendChild(img);
+    const rm = document.createElement('button');
+    rm.className = 'remove-x';
+    rm.textContent = '×';
+    rm.addEventListener('click', ()=>{
+      const v = getVistorias().find(x=>x.id===currentVistoriaId);
+      v.areaExtras[area].fotosComplementares = v.areaExtras[area].fotosComplementares.filter(id=>id!==fotoId);
+      excluirFotoDB(fotoId);
+      atualizarVistoriaNoStorage(v);
+      renderFotosComplementares(v, area);
+    });
+    wrap.appendChild(rm);
+    grid.appendChild(wrap);
+  });
+}
+
+async function processarFotoComplementar(file){
+  if(!file) return;
+  try{
+    const dataUrl = await comprimirImagem(file);
+    const fotoId = novoIdInterno();
+    await salvarFotoDB(fotoId, dataUrl);
+    const v = getVistorias().find(x=>x.id===currentVistoriaId);
+    v.areaExtras[currentArea].fotosComplementares.push(fotoId);
+    atualizarVistoriaNoStorage(v);
+    renderFotosComplementares(v, currentArea);
+  } catch(err){
+    console.error(err);
+    alert('Não foi possível salvar essa foto: o armazenamento deste navegador está cheio.\n\nTente: ir em Configurações e reduzir a qualidade das fotos, ou apagar vistorias antigas de teste.');
+  }
+}
+document.getElementById('inputFotoComplementarCamera').addEventListener('change', e=>{
+  processarFotoComplementar(e.target.files[0]);
+  e.target.value = '';
+});
+document.getElementById('inputFotoComplementarGaleria').addEventListener('change', e=>{
+  processarFotoComplementar(e.target.files[0]);
+  e.target.value = '';
+});
+
+document.getElementById('configQualidade').addEventListener('change', e=>{
+  const cfg = getConfig();
+  cfg.qualidadeFoto = e.target.value;
+  saveConfig(cfg);
+});
+
+/* ===================== RELATÓRIO FINAL (ETAPA 3) ===================== */
+
+function estadoLabel(estado){
+  if(estado==='bom') return 'Bom';
+  if(estado==='regular') return 'Regular';
+  if(estado==='ruim') return 'Ruim';
+  return 'Não avaliado';
+}
+function estadoCor(estado){
+  if(estado==='bom') return '#3B7A4E';
+  if(estado==='regular') return '#B4790A';
+  if(estado==='ruim') return '#A63D2F';
+  return '#4B5566';
+}
+
+async function montarBlocosAvaliacao(v){
+  const blocos = [];
+  for(const area of (v.areas||[])){
+    blocos.push(`<div class="rb rb-area">${area}</div>`);
+    const itens = (v.itensPorArea||{})[area] || [];
+    for(const item of itens){
+      let fotoHtml = '<div class="rb-semfoto">(sem foto)</div>';
+      if(item.fotoId){
+        const u = await obterFotoDB(item.fotoId).catch(()=>null);
+        if(u) fotoHtml = `<img src="${u}">`;
+      }
+      blocos.push(`<div class="rb rb-item">${fotoHtml}<div><div class="rbi-nome">${item.nome} — <span style="color:${estadoCor(item.estado)};">${estadoLabel(item.estado)}</span></div><div class="rbi-obs">${item.observacao ? item.observacao : '<em style="color:#999;">Sem observações.</em>'}</div></div></div>`);
+    }
+    const ex = (v.areaExtras||{})[area];
+    if(ex && ex.observacoesNovas){
+      blocos.push(`<div class="rb rb-extras"><strong>Observações novas:</strong> ${ex.observacoesNovas}</div>`);
+    }
+    if(ex && ex.fotosComplementares && ex.fotosComplementares.length){
+      let imgs = '';
+      for(const fid of ex.fotosComplementares){
+        const u = await obterFotoDB(fid).catch(()=>null);
+        if(u) imgs += `<img src="${u}">`;
+      }
+      if(imgs) blocos.push(`<div class="rb rb-fotoscomp"><div style="font-size:10.5px;color:#4B5566;margin-bottom:1.5mm;">Fotos complementares:</div>${imgs}</div>`);
+    }
+  }
+  return blocos;
+}
+
+function rodapePagina(corretor, num, total){
+  return `<div class="pg-footer"><div class="pgf-left">${corretor ? corretor.nome : ''}<br>Corretor de Imóveis<br>CRECI: ${corretor ? (corretor.creci||'-') : '-'}</div><div class="pgf-badge">Página<br><b>${num}</b> de <b>${total}</b></div></div>`;
+}
+
+async function montarCapa(v, corretor, num, total){
+  let fotoFrente = '';
+  if(v.fotoFrenteId){
+    const u = await obterFotoDB(v.fotoFrenteId).catch(()=>null);
+    if(u) fotoFrente = `<div class="cover-foto-lbl">Foto da frente da casa</div><div class="cover-foto"><img src="${u}"></div>`;
+  }
+  let vinculo = '';
+  if(v.tipo === 'saida'){
+    const e = getVistorias().find(x=>x.codigo===v.codigo && x.tipo==='entrada');
+    if(e) vinculo = `<div class="cover-vinculo">Este relatório de saída está vinculado à vistoria de entrada realizada em ${e.dataVistoria||'-'} (código ${e.codigo}).</div>`;
+  }
+  const corLinha = corretor ? `<div class="cover-corretor">Vistoria realizada por: <strong>${corretor.nome}</strong> — CRECI ${corretor.creci||'-'}${corretor.telefone?' · '+corretor.telefone:''}${corretor.email?' · '+corretor.email:''}</div>` : '';
+  return `<div class="cpage cpage-cover"><div class="pg-bar"></div>
+    <div class="cover-band"><div class="cb-small">RELATÓRIO DE VISTORIA</div><div class="cb-title">${v.tipo==='entrada' ? 'Vistoria de Entrada' : 'Vistoria de Saída'}</div><div class="cb-code">Código do imóvel: ${v.codigo}</div></div>
+    <div class="pg-content">
+      <table class="cover-info">
+        <tr><td class="lbl">Proprietário</td><td class="val">${v.proprietario||'-'}</td></tr>
+        <tr><td class="lbl">Locatário</td><td class="val">${v.locatario||'-'}</td></tr>
+        <tr><td class="lbl">Endereço</td><td class="val">${v.enderecoResumo||'-'} (${v.tipoImovel==='apartamento'?'Apartamento':'Casa'})</td></tr>
+        <tr><td class="lbl">Valor da locação</td><td class="val">${v.valorLocacao||'-'}</td></tr>
+        <tr><td class="lbl">Data da vistoria</td><td class="val">${v.dataVistoria||'-'}</td></tr>
+        <tr><td class="lbl">Situação documental</td><td class="val">${v.situacaoDocumental||'-'}</td></tr>
+      </table>
+      ${corLinha}${vinculo}${fotoFrente}
+    </div>
+    ${rodapePagina(corretor, num, total)}
+  </div>`;
+}
+
+async function montarPaginasRelatorio(v, corretor, container){
+  const blocos = await montarBlocosAvaliacao(v);
+
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;visibility:hidden;width:100mm;';
+  document.body.appendChild(probe);
+  const pxMm = probe.offsetWidth / 100;
+  probe.remove();
+
+  const contentW = (210-23-13) * pxMm;
+  const budget = 245 * pxMm;
+
+  const meas = document.createElement('div');
+  meas.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;width:${contentW}px;`;
+  meas.innerHTML = blocos.join('');
+  document.body.appendChild(meas);
+  const imgs = Array.from(meas.querySelectorAll('img'));
+  await Promise.all(imgs.map(im => im.complete ? Promise.resolve() : new Promise(r=>{ im.onload=r; im.onerror=r; })));
+
+  const paginas = [];
+  let atual = [], alt = 0;
+  Array.from(meas.children).forEach(el=>{
+    const st = getComputedStyle(el);
+    const bh = el.offsetHeight + (parseFloat(st.marginBottom)||0);
+    if(alt + bh > budget && atual.length){ paginas.push(atual); atual = []; alt = 0; }
+    atual.push(el.outerHTML);
+    alt += bh;
+  });
+  if(atual.length) paginas.push(atual);
+  meas.remove();
+
+  const total = paginas.length + 1;
+  let out = await montarCapa(v, corretor, 1, total);
+  paginas.forEach((blks, i)=>{
+    out += `<div class="cpage"><div class="pg-bar"></div><div class="pg-band">LAUDO DE VISTORIA</div><div class="pg-content">${blks.join('')}</div>${rodapePagina(corretor, i+2, total)}</div>`;
+  });
+  container.innerHTML = out;
+}
+
+async function abrirRelatorio(id){
+  if(!id) return;
+  currentVistoriaId = id;
+
+  showScreen('screen-relatorio');
+  document.getElementById('navBtn').style.display = 'none';
+  document.getElementById('footerForm').style.display = 'none';
+  document.getElementById('footerItens').style.display = 'none';
+  document.getElementById('headerTitle').textContent = 'Relatório';
+
+  const conteudo = document.getElementById('relatorioConteudo');
+  conteudo.innerHTML = '<p style="text-align:center;color:#4B5566;padding:40px 0;">Montando relatório, aguarde...</p>';
+
+  const vistoria = getVistorias().find(v=>v.id===id);
+  const corretor = getCorretor();
+  await montarPaginasRelatorio(vistoria, corretor, conteudo);
+}
+
+/* ===================== WORD EDITÁVEL (ROUND-TRIP) ===================== */
+
+const CRC_TABLE = (()=>{
+  const t = new Uint32Array(256);
+  for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c; }
+  return t;
+})();
+function crc32(bytes){ let c=0xFFFFFFFF; for(let i=0;i<bytes.length;i++) c=CRC_TABLE[(c^bytes[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function strToU8(s){ return new TextEncoder().encode(s); }
+function u8ToB64(u8){ let s=''; for(let i=0;i<u8.length;i+=8192) s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192)); return btoa(s); }
+function dataUrlToU8(d){ const b=atob(d.split(',')[1]); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; }
+function xmlEsc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function medirImg(dataUrl){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res({w:im.naturalWidth||1,h:im.naturalHeight||1}); im.onerror=()=>res({w:1,h:1}); im.src=dataUrl; }); }
+function zipStore(files){
+  const partes=[],central=[];let offset=0;
+  files.forEach(f=>{
+    const nome=strToU8(f.name),dados=f.data,crc=crc32(dados);
+    const local=new Uint8Array(30+nome.length),dv=new DataView(local.buffer);
+    dv.setUint32(0,0x04034b50,true);dv.setUint16(4,20,true);dv.setUint32(14,crc,true);dv.setUint32(18,dados.length,true);dv.setUint32(22,dados.length,true);dv.setUint16(26,nome.length,true);local.set(nome,30);
+    partes.push(local,dados);
+    const cen=new Uint8Array(46+nome.length),cv=new DataView(cen.buffer);
+    cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint32(16,crc,true);cv.setUint32(20,dados.length,true);cv.setUint32(24,dados.length,true);cv.setUint16(28,nome.length,true);cv.setUint32(42,offset,true);cen.set(nome,46);
+    central.push(cen);offset+=local.length+dados.length;
+  });
+  const cenTotal=central.reduce((a,c)=>a+c.length,0),fim=new Uint8Array(22),fv=new DataView(fim.buffer);
+  fv.setUint32(0,0x06054b50,true);fv.setUint16(8,files.length,true);fv.setUint16(10,files.length,true);fv.setUint32(12,cenTotal,true);fv.setUint32(16,offset,true);
+  const total=offset+cenTotal+22,out=new Uint8Array(total);let p=0;
+  [...partes,...central,fim].forEach(b=>{out.set(b,p);p+=b.length;});return out;
+}
+
+const K_ABRE='\u27e6',K_FECHA='\u27e7';
+function chaveOculta(txt){ return `<w:r><w:rPr><w:vanish/><w:color w:val="FFFFFF"/><w:sz w:val="2"/></w:rPr><w:t xml:space="preserve">${K_ABRE}${xmlEsc(txt)}${K_FECHA}</w:t></w:r>`; }
+function pTexto(txt,opts){
+  opts=opts||{};
+  const rPr=`<w:rPr>${opts.bold?'<w:b/>':''}${opts.italic?'<w:i/>':''}${opts.size?`<w:sz w:val="${opts.size}"/>`:''}${opts.color?`<w:color w:val="${opts.color}"/>`:''}</w:rPr>`;
+  const pPr=`<w:pPr>${opts.shd?`<w:shd w:val="clear" w:color="auto" w:fill="${opts.shd}"/>`:''}${opts.center?'<w:jc w:val="center"/>':''}${opts.borderBottom?'<w:pBdr><w:bottom w:val="single" w:sz="12" w:color="2C5F63"/></w:pBdr>':''}${opts.spaceBefore?`<w:spacing w:before="${opts.spaceBefore}"/>`:''}</w:pPr>`;
+  const linhas=String(txt||'').split('\n');
+  const runs=linhas.map((l,i)=>(i>0?'<w:r><w:br/></w:r>':'')+`<w:r>${rPr}<w:t xml:space="preserve">${xmlEsc(l)}</w:t></w:r>`).join('');
+  return `<w:p>${pPr}${opts.chave?chaveOculta(opts.chave):''}${runs}</w:p>`;
+}
+function celula(conteudo,larg,shd){ return `<w:tc><w:tcPr><w:tcW w:w="${larg}" w:type="dxa"/>${shd?`<w:shd w:val="clear" w:color="auto" w:fill="${shd}"/>`:''}<w:vAlign w:val="top"/></w:tcPr>${conteudo||'<w:p/>'}</w:tc>`; }
+function tabela(linhas,grid){
+  const g=grid.map(c=>`<w:gridCol w:w="${c}"/>`).join('');
+  return `<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders><w:top w:val="single" w:sz="4" w:color="D8DEE2"/><w:left w:val="single" w:sz="4" w:color="D8DEE2"/><w:bottom w:val="single" w:sz="4" w:color="D8DEE2"/><w:right w:val="single" w:sz="4" w:color="D8DEE2"/><w:insideH w:val="single" w:sz="4" w:color="D8DEE2"/><w:insideV w:val="single" w:sz="4" w:color="D8DEE2"/></w:tblBorders><w:tblCellMar><w:top w:w="60" w:type="dxa"/><w:left w:w="80" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${g}</w:tblGrid>${linhas.join('')}</w:tbl>`;
+}
+async function pImagem(dataUrl,larguraPx,imagens){
+  const nome=`img${String(imagens.length+1).padStart(3,'0')}.jpg`,rId=`rIdImg${imagens.length+1}`;
+  imagens.push({nome,rId,data:dataUrlToU8(dataUrl)});
+  const {w,h}=await medirImg(dataUrl);
+  const cx=larguraPx*9525,cy=Math.max(9525,Math.round((h/w)*larguraPx)*9525);
+  const n=imagens.length;
+  return `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${n}" name="Foto${n}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${n}" name="Foto${n}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rId}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+
+async function montarDocxEditavel(v,corretor){
+  const imagens=[];
+  const areaSeg=a=>String(a).replace(/\|/g,'/');
+  const corpo=[];
+  corpo.push(pTexto('RELATÓRIO DE VISTORIA',{center:true,shd:'D9D9D9',size:18,color:'5A5A5A'}));
+  corpo.push(pTexto(v.tipo==='entrada'?'Vistoria de Entrada':'Vistoria de Saída',{center:true,shd:'D9D9D9',size:32,bold:true,color:'2C5F63'}));
+  corpo.push(pTexto(`Código do imóvel: ${v.codigo}`,{center:true,shd:'D9D9D9',size:18,color:'5A5A5A'}));
+  corpo.push(pTexto('',{}));
+  const infoLinhas=[['Proprietário',v.proprietario],['Locatário',v.locatario],['Endereço',`${v.enderecoResumo||'-'} (${v.tipoImovel==='apartamento'?'Apartamento':'Casa'})`],['Valor da locação',v.valorLocacao],['Data da vistoria',v.dataVistoria],['Situação documental',v.situacaoDocumental]].map(([l,val])=>`<w:tr>${celula(pTexto(l,{color:'4B5566',size:20}),2800)}${celula(pTexto(val||'-',{bold:true,size:20}),6800)}</w:tr>`);
+  corpo.push(tabela(infoLinhas,[2800,6800]));
+  if(corretor) corpo.push(pTexto(`Vistoria realizada por: ${corretor.nome} — CRECI ${corretor.creci||'-'}${corretor.telefone?' · '+corretor.telefone:''}${corretor.email?' · '+corretor.email:''}`,{italic:true,size:18,color:'4B5566',spaceBefore:120}));
+  corpo.push(pTexto('Este arquivo pode ser editado no Word (textos, estados e fotos). Use "⇪ Importar Word" no Check House para atualizar a vistoria e gerar o PDF oficial.',{italic:true,size:16,color:'8A8A8A',spaceBefore:80}));
+  const linhasFrente=[`<w:tr>${celula(pTexto('Foto da frente da casa',{bold:true,size:20,chave:`K:frente|${v.id}`}),9600,'D9D9D9')}</w:tr>`];
+  let celFrente='<w:p/>';
+  if(v.fotoFrenteId){ const u=await obterFotoDB(v.fotoFrenteId).catch(()=>null); if(u) celFrente=await pImagem(u,380,imagens); }
+  linhasFrente.push(`<w:tr>${celula(celFrente,9600)}</w:tr>`);
+  corpo.push(pTexto('',{spaceBefore:120}));
+  corpo.push(tabela(linhasFrente,[9600]));
+  corpo.push(`<w:p><w:r><w:br w:type="page"/></w:r></w:p>`);
+  const GRID=[1900,2500,1400,3800];
+  for(const area of (v.areas||[])){
+    corpo.push(pTexto(area,{bold:true,size:26,color:'2C5F63',borderBottom:true,spaceBefore:240}));
+    const linhas=[];
+    linhas.push(`<w:tr>${celula(pTexto('Foto',{bold:true,size:19,chave:`K:area|${v.id}|${areaSeg(area)}`}),GRID[0],'D9D9D9')}${celula(pTexto('Item',{bold:true,size:19}),GRID[1],'D9D9D9')}${celula(pTexto('Estado',{bold:true,size:19}),GRID[2],'D9D9D9')}${celula(pTexto('Observações',{bold:true,size:19}),GRID[3],'D9D9D9')}</w:tr>`);
+    for(const item of ((v.itensPorArea||{})[area]||[])){
+      let celFoto='<w:p/>';
+      if(item.fotoId){ const u=await obterFotoDB(item.fotoId).catch(()=>null); if(u) celFoto=await pImagem(u,130,imagens); }
+      linhas.push(`<w:tr>${celula(celFoto,GRID[0])}${celula(pTexto(item.nome,{bold:true,size:20,chave:`K:item|${v.id}|${areaSeg(area)}|${item.id}`}),GRID[1])}${celula(pTexto(estadoLabel(item.estado),{size:20}),GRID[2])}${celula(pTexto(item.observacao||'',{size:20}),GRID[3])}</w:tr>`);
+    }
+    corpo.push(tabela(linhas,GRID));
+    const ex=(v.areaExtras||{})[area]||{observacoesNovas:'',fotosComplementares:[]};
+    const linhasEx=[];
+    linhasEx.push(`<w:tr>${celula(pTexto('Observações novas',{bold:true,size:19,chave:`K:extraobs|${v.id}|${areaSeg(area)}`}),2400,'F3F4F5')}${celula(pTexto(ex.observacoesNovas||'',{size:20}),7200)}</w:tr>`);
+    let celFotosC='<w:p/>';
+    if(ex.fotosComplementares&&ex.fotosComplementares.length){
+      const urls=[];
+      for(const fid of ex.fotosComplementares){ const u=await obterFotoDB(fid).catch(()=>null); if(u) urls.push(u); }
+      if(urls.length){
+        let runs='';
+        for(const u of urls){ const p=await pImagem(u,85,imagens); runs+=p.replace(/^<w:p>/,'').replace(/<\/w:p>$/,''); }
+        celFotosC=`<w:p>${runs}</w:p>`;
+      }
+    }
+    linhasEx.push(`<w:tr>${celula(pTexto('Fotos complementares',{bold:true,size:19,chave:`K:extrafotos|${v.id}|${areaSeg(area)}`}),2400,'F3F4F5')}${celula(celFotosC,7200)}</w:tr>`);
+    corpo.push(pTexto('',{}));
+    corpo.push(tabela(linhasEx,[2400,7200]));
+  }
+  const docXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${corpo.join('')}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708"/></w:sectPr></w:body></w:document>`;
+  const relsXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${imagens.map(im=>`<Relationship Id="${im.rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${im.nome}"/>`).join('')}</Relationships>`;
+  const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpg" ContentType="image/jpeg"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`;
+  return zipStore([{name:'[Content_Types].xml',data:strToU8(contentTypes)},{name:'_rels/.rels',data:strToU8(rootRels)},{name:'word/document.xml',data:strToU8(docXml)},{name:'word/_rels/document.xml.rels',data:strToU8(relsXml)},...imagens.map(im=>({name:'word/media/'+im.nome,data:im.data}))]);
+}
+
+async function baixarWord(){
+  const vistoria=getVistorias().find(v=>v.id===currentVistoriaId);
+  const corretor=getCorretor();
+  try{
+    const zip=await montarDocxEditavel(vistoria,corretor);
+    const blob=new Blob([zip],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+    const link=document.createElement('a');
+    link.href=URL.createObjectURL(blob);
+    link.download=`CheckHouse_${vistoria.codigo}_${vistoria.tipo}.docx`;
+    document.body.appendChild(link);link.click();document.body.removeChild(link);
+  } catch(err){ console.error(err); alert('Não foi possível gerar o Word editável. Tente novamente ou use o PDF.'); }
+}
+
+/* ---------- Importação do docx editado de volta ao app ---------- */
+
+async function unzipDocx(buf){
+  const b=new Uint8Array(buf),dv=new DataView(buf);
+  let e=-1;
+  for(let i=b.length-22;i>=Math.max(0,b.length-70000);i--){ if(b[i]===0x50&&b[i+1]===0x4b&&b[i+2]===0x05&&b[i+3]===0x06){e=i;break;} }
+  if(e<0) throw new Error('Arquivo não é um .docx válido.');
+  const total=dv.getUint16(e+10,true);let off=dv.getUint32(e+16,true);
+  const arquivos={};
+  for(let n=0;n<total;n++){
+    if(dv.getUint32(off,true)!==0x02014b50) throw new Error('Estrutura do .docx inválida.');
+    const metodo=dv.getUint16(off+10,true),csize=dv.getUint32(off+20,true);
+    const nlen=dv.getUint16(off+28,true),elen=dv.getUint16(off+30,true),clen=dv.getUint16(off+32,true);
+    const lofs=dv.getUint32(off+42,true),nome=new TextDecoder().decode(b.subarray(off+46,off+46+nlen));
+    const lnlen=dv.getUint16(lofs+26,true),lelen=dv.getUint16(lofs+28,true);
+    const inicio=lofs+30+lnlen+lelen,comp=b.subarray(inicio,inicio+csize);
+    let dados;
+    if(metodo===0) dados=comp.slice();
+    else if(metodo===8){
+      if(typeof DecompressionStream==='undefined') throw new Error('Atualize o navegador para suportar importação de .docx comprimido.');
+      const stream=new Blob([comp]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      dados=new Uint8Array(await new Response(stream).arrayBuffer());
+    } else throw new Error('Compressão não suportada.');
+    arquivos[nome]=dados;off+=46+nlen+elen+clen;
+  }
+  return arquivos;
+}
+function filhosPorNome(el,nome){ return Array.from(el.children).filter(c=>c.localName===nome); }
+function lerCelula(tc){
+  const chaves=[],embeds=[];const linhas=[];
+  Array.from(tc.getElementsByTagName('*')).forEach(el=>{ if(el.localName==='blip') for(const at of el.attributes){ if(at.localName==='embed') embeds.push(at.value); } });
+  filhosPorNome(tc,'p').forEach(p=>{
+    let txt='';
+    Array.from(p.getElementsByTagName('*')).forEach(el=>{
+      if(el.localName!=='r') return;
+      const rPr=Array.from(el.children).find(c=>c.localName==='rPr');
+      const oculto=rPr&&Array.from(rPr.children).some(c=>c.localName==='vanish');
+      Array.from(el.children).forEach(c=>{
+        if(c.localName==='t'){ if(oculto){ const m=c.textContent.match(new RegExp(K_ABRE+'([^'+K_FECHA+']+)'+K_FECHA)); if(m) chaves.push(m[1]); } else txt+=c.textContent; }
+        if(c.localName==='br'&&!oculto) txt+='\n';
+      });
+    });
+    linhas.push(txt);
+  });
+  return {texto:linhas.join('\n').trim(),chaves,embeds};
+}
+function parseEstadoTexto(t){ const s=(t||'').toLowerCase(); if(s.includes('bom')) return 'bom'; if(s.includes('regular')) return 'regular'; if(s.includes('ruim')) return 'ruim'; return ''; }
+
+async function importarWordEditado(file){
+  try{
+    const arquivos=await unzipDocx(await file.arrayBuffer());
+    if(!arquivos['word/document.xml']) throw new Error('document.xml não encontrado.');
+    const parser=new DOMParser();
+    const doc=parser.parseFromString(new TextDecoder().decode(arquivos['word/document.xml']),'application/xml');
+    const relsDoc=arquivos['word/_rels/document.xml.rels']?parser.parseFromString(new TextDecoder().decode(arquivos['word/_rels/document.xml.rels']),'application/xml'):null;
+    const rels={};
+    if(relsDoc) Array.from(relsDoc.getElementsByTagName('*')).forEach(el=>{ if(el.localName==='Relationship') rels[el.getAttribute('Id')]=el.getAttribute('Target'); });
+    function embedUrl(id){
+      let alvo=rels[id]; if(!alvo) return null;
+      alvo=alvo.replace(/^\//,'').replace(/^word\//,'');
+      const bytes=arquivos['word/'+alvo]; if(!bytes) return null;
+      const mime=/\.png$/i.test(alvo)?'image/png':'image/jpeg';
+      return 'data:'+mime+';base64,'+u8ToB64(bytes);
+    }
+    const tabelas=Array.from(doc.getElementsByTagName('*')).filter(el=>el.localName==='tbl');
+    let vAlvo=null;
+    const resumo={obs:0,estados:0,fotos:0,novos:0,extras:0,frente:0};
+    function garantir(vid){
+      if(vAlvo) return vAlvo.id===vid;
+      const a=getVistorias().find(x=>x.id===vid); if(!a) return false;
+      vAlvo=a; return true;
+    }
+    for(const tbl of tabelas){
+      let areaDaTabela=null;
+      const linhas=filhosPorNome(tbl,'tr');
+      for(const tr of linhas){
+        const cels=filhosPorNome(tr,'tc').map(lerCelula);
+        const todasChaves=cels.flatMap(c=>c.chaves);
+        const kItem=todasChaves.find(k=>k.startsWith('K:item|'));
+        const kArea=todasChaves.find(k=>k.startsWith('K:area|'));
+        const kFrente=todasChaves.find(k=>k.startsWith('K:frente|'));
+        const kExtraObs=todasChaves.find(k=>k.startsWith('K:extraobs|'));
+        const kExtraFotos=todasChaves.find(k=>k.startsWith('K:extrafotos|'));
+        if(kFrente){ const vid=kFrente.split('|')[1]; garantir(vid); continue; }
+        if(kArea){ const[,vid,area]=kArea.split('|'); garantir(vid); areaDaTabela=area; continue; }
+        if(kExtraObs){
+          const[,vid,area]=kExtraObs.split('|'); if(!garantir(vid)) continue;
+          vAlvo.areaExtras[area]=vAlvo.areaExtras[area]||{observacoesNovas:'',fotosComplementares:[]};
+          const novo=(cels[1]?cels[1].texto:'').trim();
+          if(novo!==(vAlvo.areaExtras[area].observacoesNovas||'')){ vAlvo.areaExtras[area].observacoesNovas=novo; resumo.extras++; } continue;
+        }
+        if(kExtraFotos){
+          const[,vid,area]=kExtraFotos.split('|'); if(!garantir(vid)) continue;
+          vAlvo.areaExtras[area]=vAlvo.areaExtras[area]||{observacoesNovas:'',fotosComplementares:[]};
+          const embeds=cels[1]?cels[1].embeds:[];const novosIds=[];
+          for(const em of embeds){ const u=embedUrl(em); if(u){ const fid=novoIdInterno(); await salvarFotoDB(fid,u); novosIds.push(fid); } }
+          vAlvo.areaExtras[area].fotosComplementares=novosIds; continue;
+        }
+        if(kItem){
+          const[,vid,area,itemId]=kItem.split('|'); if(!garantir(vid)) continue;
+          const lista=(vAlvo.itensPorArea||{})[area];const it=lista?lista.find(x=>x.id===itemId):null; if(!it) continue;
+          const ne=parseEstadoTexto(cels[2]?cels[2].texto:''); if(ne!==it.estado){ it.estado=ne; resumo.estados++; }
+          const no=(cels[3]?cels[3].texto:'').trim(); if(no!==(it.observacao||'')){ it.observacao=no; resumo.obs++; }
+          const em=cels[0]&&cels[0].embeds[0]; if(em){ const u=embedUrl(em); if(u){ const fid=it.fotoId||novoIdInterno(); await salvarFotoDB(fid,u); it.fotoId=fid; resumo.fotos++; } }
+          continue;
+        }
+        if(areaDaTabela&&vAlvo&&cels.length>=2){
+          const nome=(cels[1].texto||'').split('\n')[0].trim(); if(!nome) continue;
+          const novo={id:novoIdInterno(),nome,custom:true,estado:parseEstadoTexto(cels[2]?cels[2].texto:''),observacao:(cels[3]?cels[3].texto:'').trim(),fotoId:null};
+          const em=cels[0]&&cels[0].embeds[0]; if(em){ const u=embedUrl(em); if(u){ novo.fotoId=novoIdInterno(); await salvarFotoDB(novo.fotoId,u); resumo.fotos++; } }
+          vAlvo.itensPorArea[areaDaTabela]=vAlvo.itensPorArea[areaDaTabela]||[]; vAlvo.itensPorArea[areaDaTabela].push(novo); resumo.novos++;
+        }
+      }
+      const p0=linhas[0]?filhosPorNome(linhas[0],'tc').map(lerCelula):[];
+      const kF=p0.flatMap(c=>c.chaves).find(k=>k.startsWith('K:frente|'));
+      if(kF&&linhas[1]&&vAlvo){
+        const c=filhosPorNome(linhas[1],'tc').map(lerCelula)[0];
+        const em=c&&c.embeds[0]; if(em){ const u=embedUrl(em); if(u){ const fid=vAlvo.fotoFrenteId||novoIdInterno(); await salvarFotoDB(fid,u); vAlvo.fotoFrenteId=fid; resumo.frente=1; } }
+      }
+    }
+    if(!vAlvo) throw new Error('Marcadores do Check House não encontrados. Use um Word gerado pelo próprio app.');
+    atualizarVistoriaNoStorage(vAlvo);
+    abrirItens(vAlvo.id);
+    alert(`Importação concluída!\n\n· ${resumo.estados} estado(s) atualizado(s)\n· ${resumo.obs} observação(ões) atualizada(s)\n· ${resumo.fotos} foto(s) importada(s)${resumo.frente?'\n· Foto da frente atualizada':''}\n· ${resumo.novos} item(ns) novo(s)\n· ${resumo.extras} campo(s) de observações novas atualizado(s)`);
+  } catch(err){ console.error(err); alert('Falha na importação: '+err.message); }
+}
+
+document.getElementById('inputImportWord').addEventListener('change', e=>{
+  const f = e.target.files[0];
+  if(f) importarWordEditado(f);
+  e.target.value = '';
+});
+
+/* ===================== INIT ===================== */
+iniciarApp();
+</script>
+
+
+<script>
+/* ===== SERVICE WORKER + PWA INSTALL ===== */
+if('serviceWorker' in navigator){
+  // Service worker inline como blob (sem precisar de arquivo separado)
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    console.log('SW registrado:', reg.scope);
+  }).catch(err => {
+    console.log('SW não registrado (normal em arquivo local):', err.message);
+  });
+}
+
+// Botão de instalação como PWA
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('btnInstalarPWA').style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('btnInstalarPWA').style.display = 'none';
+  deferredPrompt = null;
+  alert('Check House instalado com sucesso! Procure o ícone na tela inicial do seu celular.');
+});
+function instalarPWA(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      deferredPrompt = null;
+    });
+  } else {
+    alert('Para instalar o Check House:\n\n📱 Android (Chrome): toque nos 3 pontos do menu → "Adicionar à tela inicial"\n🍎 iPhone (Safari): toque no botão compartilhar → "Adicionar à Tela de Início"');
+  }
+}
+</script>
+</body>
+</html>
