@@ -18,6 +18,9 @@ echo.
 REM Instala dependencias
 echo [..] Instalando pywin32...
 pip install pywin32 --quiet
+
+echo [..] Instalando pyperclip...
+pip install pyperclip --quiet
 if errorlevel 1 (
     echo [XX] Falha ao instalar pywin32
     pause
