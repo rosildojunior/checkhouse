@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Proteus Circuit",
+  "description": "Formato padrão para descrever circuitos eletrônicos para o Proteus Builder",
+  "type": "object",
+  "required": ["name", "components", "wires"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome do circuito"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição do funcionamento"
+    },
+    "supply_voltage": {
+      "type": "number",
+      "description": "Tensão de alimentação em Volts",
+      "default": 5
+    },
+    "components": {
+      "type": "array",
+      "description": "Lista de componentes do circuito",
+      "items": {
+        "type": "object",
+        "required": ["ref", "part"],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "description": "Designador de referência (ex: R1, C1, U1, LED1)"
+          },
+          "part": {
+            "type": "string",
+            "description": "Nome genérico ou exato do componente (ex: RES, NE555, BC547, LED)"
+          },
+          "library": {
+            "type": "string",
+            "description": "Biblioteca Proteus (opcional — resolvido automaticamente se omitido)"
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor do componente (ex: 10k, 100uF, 5V)"
+          },
+          "rotation": {
+            "type": "integer",
+            "description": "Rotação em graus (0, 90, 180, 270)",
+            "default": 0
+          },
+          "position": {
+            "type": "object",
+            "description": "Posição no esquemático (omitir para auto-layout)",
+            "properties": {
+              "x": { "type": "integer" },
+              "y": { "type": "integer" }
+            },
+            "required": ["x", "y"]
+          }
+        }
+      }
+    },
+    "wires": {
+      "type": "array",
+      "description": "Lista de conexões (fios) entre pinos",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "from": {
+            "type": "object",
+            "required": ["ref", "pin"],
+            "properties": {
+              "ref": { "type": "string", "description": "RefDes do componente origem" },
+              "pin": { "type": "string", "description": "Nome ou número do pino" }
+            }
+          },
+          "to": {
+            "type": "object",
+            "required": ["ref", "pin"],
+            "properties": {
+              "ref": { "type": "string", "description": "RefDes do componente destino" },
+              "pin": { "type": "string", "description": "Nome ou número do pino" }
+            }
+          },
+          "net": {
+            "type": "string",
+            "description": "Nome da net (opcional, ex: VCC, GND, NET1)"
+          }
+        }
+      }
+    },
+    "power_nets": {
+      "type": "object",
+      "description": "Define os potenciais das redes de alimentação",
+      "additionalProperties": { "type": "number" },
+      "examples": [{ "VCC": 5, "GND": 0, "VDD": 3.3 }]
+    }
+  }
+}

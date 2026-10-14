@@ -1,0 +1,39 @@
+{
+  "name": "Amplificador de Sinal com BC547",
+  "description": "Amplificador emissor-comum com BC547. Ganho ~100x. Ideal para microfone.",
+  "supply_voltage": 12,
+  "components": [
+    { "ref": "Q1",  "part": "BC547",   "value": "BC547" },
+    { "ref": "R1",  "part": "RES",     "value": "100k"  },
+    { "ref": "R2",  "part": "RES",     "value": "10k"   },
+    { "ref": "R3",  "part": "RES",     "value": "4k7"   },
+    { "ref": "R4",  "part": "RES",     "value": "1k"    },
+    { "ref": "C1",  "part": "CAP-ELEC","value": "10uF"  },
+    { "ref": "C2",  "part": "CAP-ELEC","value": "10uF"  },
+    { "ref": "C3",  "part": "CAP-ELEC","value": "100uF" },
+    { "ref": "P1",  "part": "CONN2",   "value": "IN"    },
+    { "ref": "P2",  "part": "CONN2",   "value": "OUT"   },
+    { "ref": "BAT1","part": "BATTERY", "value": "12V"   }
+  ],
+  "wires": [
+    { "from": {"ref": "BAT1","pin": "+"}, "to": {"ref": "R1", "pin": "1"}, "net": "VCC" },
+    { "from": {"ref": "BAT1","pin": "+"}, "to": {"ref": "R3", "pin": "1"}, "net": "VCC" },
+    { "from": {"ref": "R1",  "pin": "2"}, "to": {"ref": "R2", "pin": "1"}, "net": "BASE" },
+    { "from": {"ref": "R2",  "pin": "2"}, "to": {"ref": "BAT1","pin": "-"},"net": "GND" },
+    { "from": {"ref": "R1",  "pin": "2"}, "to": {"ref": "C1",  "pin": "+"}, "net": "BASE_AC" },
+    { "from": {"ref": "C1",  "pin": "-"}, "to": {"ref": "Q1",  "pin": "B"},  "net": "BASE_DC" },
+    { "from": {"ref": "P1",  "pin": "1"}, "to": {"ref": "C1",  "pin": "+"},  "net": "BASE_AC" },
+    { "from": {"ref": "P1",  "pin": "2"}, "to": {"ref": "BAT1","pin": "-"},  "net": "GND" },
+    { "from": {"ref": "R2",  "pin": "1"}, "to": {"ref": "Q1",  "pin": "B"},  "net": "BASE_DC" },
+    { "from": {"ref": "R3",  "pin": "2"}, "to": {"ref": "Q1",  "pin": "C"},  "net": "COLETOR" },
+    { "from": {"ref": "Q1",  "pin": "E"}, "to": {"ref": "R4",  "pin": "1"},  "net": "EMISSOR" },
+    { "from": {"ref": "R4",  "pin": "2"}, "to": {"ref": "BAT1","pin": "-"},  "net": "GND" },
+    { "from": {"ref": "Q1",  "pin": "E"}, "to": {"ref": "C3",  "pin": "+"},  "net": "EMISSOR" },
+    { "from": {"ref": "C3",  "pin": "-"}, "to": {"ref": "BAT1","pin": "-"},  "net": "GND" },
+    { "from": {"ref": "R3",  "pin": "2"}, "to": {"ref": "C2",  "pin": "+"},  "net": "COLETOR" },
+    { "from": {"ref": "C2",  "pin": "-"}, "to": {"ref": "P2",  "pin": "1"},  "net": "OUT" },
+    { "from": {"ref": "P2",  "pin": "2"}, "to": {"ref": "BAT1","pin": "-"},  "net": "GND" },
+    { "from": {"ref": "BAT1","pin": "-"}, "to": {"ref": "R4",  "pin": "2"},  "net": "GND" }
+  ],
+  "power_nets": { "VCC": 12, "GND": 0 }
+}
