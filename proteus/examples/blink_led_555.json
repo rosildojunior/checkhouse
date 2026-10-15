@@ -1,68 +1,43 @@
 {
-  "name": "Piscador de LED com NE555",
-  "description": "Circuito astável com NE555 piscando um LED na frequência de ~1 Hz",
+  "name": "Pisca LED NE555",
+  "description": "Circuito oscilador astável com NE555 piscando um LED. Frequência ~1Hz com R1=R2=47k e C1=10uF.",
   "supply_voltage": 5,
+
   "components": [
-    {
-      "ref": "U1",
-      "part": "NE555",
-      "value": "NE555"
-    },
-    {
-      "ref": "R1",
-      "part": "RES",
-      "value": "47k"
-    },
-    {
-      "ref": "R2",
-      "part": "RES",
-      "value": "47k"
-    },
-    {
-      "ref": "R3",
-      "part": "RES",
-      "value": "470R"
-    },
-    {
-      "ref": "C1",
-      "part": "CAP-ELEC",
-      "value": "10uF"
-    },
-    {
-      "ref": "C2",
-      "part": "CAP",
-      "value": "10nF"
-    },
-    {
-      "ref": "LED1",
-      "part": "LED",
-      "value": "LED-RED"
-    },
-    {
-      "ref": "BAT1",
-      "part": "BATTERY",
-      "value": "5V"
-    }
+    { "ref": "U1",   "part": "NE555",    "value": "NE555"   },
+    { "ref": "R1",   "part": "RES",      "value": "47k"     },
+    { "ref": "R2",   "part": "RES",      "value": "47k"     },
+    { "ref": "R3",   "part": "RES",      "value": "470R"    },
+    { "ref": "C1",   "part": "CAP-ELEC", "value": "10uF"    },
+    { "ref": "C2",   "part": "CAP",      "value": "10nF"    },
+    { "ref": "LED1", "part": "LED",      "value": "LED-RED" },
+    { "ref": "BAT1", "part": "BATTERY",  "value": "5V"      }
   ],
-  "wires": [
-    { "from": {"ref": "BAT1", "pin": "+"}, "to": {"ref": "U1", "pin": "VCC"},  "net": "VCC" },
-    { "from": {"ref": "BAT1", "pin": "+"}, "to": {"ref": "U1", "pin": "RST"},  "net": "VCC" },
-    { "from": {"ref": "BAT1", "pin": "-"}, "to": {"ref": "U1", "pin": "GND"},  "net": "GND" },
-    { "from": {"ref": "U1",   "pin": "VCC"}, "to": {"ref": "R1", "pin": "1"},  "net": "VCC" },
-    { "from": {"ref": "R1",   "pin": "2"}, "to": {"ref": "R2", "pin": "1"},   "net": "RA" },
-    { "from": {"ref": "R1",   "pin": "2"}, "to": {"ref": "U1", "pin": "DIS"},  "net": "RA" },
-    { "from": {"ref": "R2",   "pin": "2"}, "to": {"ref": "U1", "pin": "THR"},  "net": "RB" },
-    { "from": {"ref": "R2",   "pin": "2"}, "to": {"ref": "U1", "pin": "TRG"},  "net": "RB" },
-    { "from": {"ref": "R2",   "pin": "2"}, "to": {"ref": "C1", "pin": "+"},    "net": "RB" },
-    { "from": {"ref": "C1",   "pin": "-"}, "to": {"ref": "BAT1", "pin": "-"},  "net": "GND" },
-    { "from": {"ref": "U1",   "pin": "CV"}, "to": {"ref": "C2", "pin": "1"}  },
-    { "from": {"ref": "C2",   "pin": "2"}, "to": {"ref": "BAT1", "pin": "-"},  "net": "GND" },
-    { "from": {"ref": "U1",   "pin": "OUT"}, "to": {"ref": "R3", "pin": "1"}, "net": "OUT" },
-    { "from": {"ref": "R3",   "pin": "2"}, "to": {"ref": "LED1", "pin": "A"}, "net": "LED_A" },
-    { "from": {"ref": "LED1", "pin": "K"}, "to": {"ref": "BAT1", "pin": "-"},  "net": "GND" }
+
+  "netlist": [
+    { "ref": "U1",   "pin": "VCC", "net": "VCC"   },
+    { "ref": "U1",   "pin": "RST", "net": "VCC"   },
+    { "ref": "U1",   "pin": "GND", "net": "GND"   },
+    { "ref": "U1",   "pin": "DIS", "net": "RA"    },
+    { "ref": "U1",   "pin": "THR", "net": "RB"    },
+    { "ref": "U1",   "pin": "TRG", "net": "RB"    },
+    { "ref": "U1",   "pin": "OUT", "net": "OUT"   },
+    { "ref": "U1",   "pin": "CV",  "net": "CV"    },
+    { "ref": "R1",   "pin": "1",   "net": "VCC"   },
+    { "ref": "R1",   "pin": "2",   "net": "RA"    },
+    { "ref": "R2",   "pin": "1",   "net": "RA"    },
+    { "ref": "R2",   "pin": "2",   "net": "RB"    },
+    { "ref": "R3",   "pin": "1",   "net": "OUT"   },
+    { "ref": "R3",   "pin": "2",   "net": "LED_A" },
+    { "ref": "C1",   "pin": "+",   "net": "RB"    },
+    { "ref": "C1",   "pin": "-",   "net": "GND"   },
+    { "ref": "C2",   "pin": "1",   "net": "CV"    },
+    { "ref": "C2",   "pin": "2",   "net": "GND"   },
+    { "ref": "LED1", "pin": "A",   "net": "LED_A" },
+    { "ref": "LED1", "pin": "K",   "net": "GND"   },
+    { "ref": "BAT1", "pin": "+",   "net": "VCC"   },
+    { "ref": "BAT1", "pin": "-",   "net": "GND"   }
   ],
-  "power_nets": {
-    "VCC": 5,
-    "GND": 0
-  }
+
+  "power_nets": { "VCC": 5, "GND": 0 }
 }

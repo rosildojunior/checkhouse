@@ -1,98 +1,89 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Proteus Circuit",
-  "description": "Formato padrão para descrever circuitos eletrônicos para o Proteus Builder",
+  "title": "Proteus Circuit Builder — Netlist Schema",
+  "description": "Formato tabular: cada pino aparece exatamente uma vez, mapeado ao seu net.",
   "type": "object",
-  "required": ["name", "components", "wires"],
+  "required": ["name", "components", "netlist"],
   "properties": {
-    "name": {
-      "type": "string",
-      "description": "Nome do circuito"
-    },
-    "description": {
-      "type": "string",
-      "description": "Descrição do funcionamento"
-    },
-    "supply_voltage": {
-      "type": "number",
-      "description": "Tensão de alimentação em Volts",
-      "default": 5
-    },
+    "name":        { "type": "string", "description": "Nome do circuito" },
+    "description": { "type": "string" },
+    "supply_voltage": { "type": "number", "description": "Tensão de alimentação (V)" },
+
     "components": {
       "type": "array",
-      "description": "Lista de componentes do circuito",
+      "description": "Lista de componentes",
       "items": {
         "type": "object",
         "required": ["ref", "part"],
         "properties": {
-          "ref": {
-            "type": "string",
-            "description": "Designador de referência (ex: R1, C1, U1, LED1)"
-          },
-          "part": {
-            "type": "string",
-            "description": "Nome genérico ou exato do componente (ex: RES, NE555, BC547, LED)"
-          },
-          "library": {
-            "type": "string",
-            "description": "Biblioteca Proteus (opcional — resolvido automaticamente se omitido)"
-          },
-          "value": {
-            "type": "string",
-            "description": "Valor do componente (ex: 10k, 100uF, 5V)"
-          },
-          "rotation": {
-            "type": "integer",
-            "description": "Rotação em graus (0, 90, 180, 270)",
-            "default": 0
-          },
-          "position": {
-            "type": "object",
-            "description": "Posição no esquemático (omitir para auto-layout)",
-            "properties": {
-              "x": { "type": "integer" },
-              "y": { "type": "integer" }
-            },
-            "required": ["x", "y"]
-          }
+          "ref":   { "type": "string", "description": "Referência única, ex: U1, R1" },
+          "part":  { "type": "string", "description": "Nome da parte na biblioteca Proteus, ex: NE555, RES" },
+          "value": { "type": "string", "description": "Valor ou modelo, ex: 47k, LED-RED" }
         }
       }
     },
-    "wires": {
+
+    "netlist": {
       "type": "array",
-      "description": "Lista de conexões (fios) entre pinos",
+      "description": "Tabela de conexões: uma linha por pino, mapeando pino → net",
       "items": {
         "type": "object",
-        "required": ["from", "to"],
+        "required": ["ref", "pin", "net"],
         "properties": {
-          "from": {
-            "type": "object",
-            "required": ["ref", "pin"],
-            "properties": {
-              "ref": { "type": "string", "description": "RefDes do componente origem" },
-              "pin": { "type": "string", "description": "Nome ou número do pino" }
-            }
-          },
-          "to": {
-            "type": "object",
-            "required": ["ref", "pin"],
-            "properties": {
-              "ref": { "type": "string", "description": "RefDes do componente destino" },
-              "pin": { "type": "string", "description": "Nome ou número do pino" }
-            }
-          },
-          "net": {
-            "type": "string",
-            "description": "Nome da net (opcional, ex: VCC, GND, NET1)"
-          }
+          "ref":  { "type": "string", "description": "Referência do componente, ex: U1" },
+          "pin":  { "type": "string", "description": "Nome do pino conforme a biblioteca Proteus, ex: VCC, 1, A" },
+          "net":  { "type": "string", "description": "Nome da rede elétrica, ex: VCC, GND, RA" }
         }
       }
     },
+
     "power_nets": {
       "type": "object",
-      "description": "Define os potenciais das redes de alimentação",
+      "description": "Declara quais nets são de alimentação e qual a tensão (V). GND = 0.",
       "additionalProperties": { "type": "number" },
-      "examples": [{ "VCC": 5, "GND": 0, "VDD": 3.3 }]
+      "examples": [{ "VCC": 5, "GND": 0 }]
     }
-  }
+  },
+
+  "examples": [
+    {
+      "name": "Pisca LED NE555",
+      "supply_voltage": 5,
+      "components": [
+        { "ref": "U1",   "part": "NE555",    "value": "NE555"   },
+        { "ref": "R1",   "part": "RES",      "value": "47k"     },
+        { "ref": "R2",   "part": "RES",      "value": "47k"     },
+        { "ref": "R3",   "part": "RES",      "value": "470R"    },
+        { "ref": "C1",   "part": "CAP-ELEC", "value": "10uF"    },
+        { "ref": "C2",   "part": "CAP",      "value": "10nF"    },
+        { "ref": "LED1", "part": "LED",      "value": "LED-RED" },
+        { "ref": "BAT1", "part": "BATTERY",  "value": "5V"      }
+      ],
+      "netlist": [
+        { "ref": "U1",   "pin": "VCC", "net": "VCC"   },
+        { "ref": "U1",   "pin": "RST", "net": "VCC"   },
+        { "ref": "U1",   "pin": "GND", "net": "GND"   },
+        { "ref": "U1",   "pin": "DIS", "net": "RA"    },
+        { "ref": "U1",   "pin": "THR", "net": "RB"    },
+        { "ref": "U1",   "pin": "TRG", "net": "RB"    },
+        { "ref": "U1",   "pin": "OUT", "net": "OUT"   },
+        { "ref": "U1",   "pin": "CV",  "net": "CV"    },
+        { "ref": "R1",   "pin": "1",   "net": "VCC"   },
+        { "ref": "R1",   "pin": "2",   "net": "RA"    },
+        { "ref": "R2",   "pin": "1",   "net": "RA"    },
+        { "ref": "R2",   "pin": "2",   "net": "RB"    },
+        { "ref": "R3",   "pin": "1",   "net": "OUT"   },
+        { "ref": "R3",   "pin": "2",   "net": "LED_A" },
+        { "ref": "C1",   "pin": "+",   "net": "RB"    },
+        { "ref": "C1",   "pin": "-",   "net": "GND"   },
+        { "ref": "C2",   "pin": "1",   "net": "CV"    },
+        { "ref": "C2",   "pin": "2",   "net": "GND"   },
+        { "ref": "LED1", "pin": "A",   "net": "LED_A" },
+        { "ref": "LED1", "pin": "K",   "net": "GND"   },
+        { "ref": "BAT1", "pin": "+",   "net": "VCC"   },
+        { "ref": "BAT1", "pin": "-",   "net": "GND"   }
+      ],
+      "power_nets": { "VCC": 5, "GND": 0 }
+    }
+  ]
 }

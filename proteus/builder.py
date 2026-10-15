@@ -1,182 +1,185 @@
 #!/usr/bin/env python3
 """
-builder.py — Cria circuitos Proteus automaticamente a partir de um arquivo JSON.
-Usa o servidor MCP nativo do Proteus ProPilot via JSON-RPC 2.0.
+builder.py — Cria circuitos Proteus a partir de um JSON com netlist tabular.
+
+Formato de entrada (schema.json):
+  components[]  — lista de componentes { ref, part, value }
+  netlist[]     — tabela pino→net:  { ref, pin, net }
+  power_nets{}  — { "VCC": 5, "GND": 0 }
+
+Fluxo:
+  1. Parts bin via Pick Devices (ui_act)
+  2. Placement topológico (BFS do componente mais conectado)
+  3. Terminais POWER/GROUND nas nets de alimentação
+  4. Terminais DEFAULT (net labels) em cada pino de sinal
+  5. schematic_route_nets para desenhar os stubs pino→label
+  6. Salva
 
 Uso:
-    python builder.py caminho/para/circuito.json
+    python builder.py circuito.json
 """
 
-import sys
-import json
-import time
-import urllib.request
-import urllib.error
-import argparse
+import sys, json, time, urllib.request, urllib.error, argparse
 
 MCP_URL = "http://localhost:8001"
 
-# Mapeamento: nome do part -> (keyword de busca, índice de categoria)
-# Índice 0 = (All Categories), 26 = Simulator Primitives, 3 = Analog ICs
+# ---------------------------------------------------------------------------
+# Configuração de busca no Pick Devices
+# ---------------------------------------------------------------------------
 PART_SEARCH_CONFIG = {
-    "RES":      ("Generic resistor symbol",   0),
-    "CAP":      ("Generic capacitor",         0),
-    "CAP-ELEC": ("Electrolytic capacitor",    0),
-    "LED":      ("Light emitting diode",      0),
-    "BATTERY":  ("DC Voltage Source",        26),
-    "NE555":    ("NE555",                     0),
+    "RES":       ("Generic resistor symbol",   0),
+    "CAP":       ("Generic capacitor",         0),
+    "CAP-ELEC":  ("Electrolytic capacitor",    0),
+    "LED":       ("Light emitting diode",      0),
+    "BATTERY":   ("DC Voltage Source",        26),
+    "NE555":     ("NE555",                     0),
+    "BC547":     ("BC547",                     0),
+    "BC557":     ("BC557",                     0),
+    "LM741":     ("LM741",                     0),
+    "LM358":     ("LM358",                     0),
+    "DIODE":     ("Generic signal diode",      0),
+    "ZENER":     ("Generic zener diode",       0),
+    "SW-SPST":   ("Single pole single throw",  0),
+    "POT-HG":    ("Variable resistor",         0),
+    "INDUCTOR":  ("Generic inductor",          0),
 }
+
+# ---------------------------------------------------------------------------
+# Geometria dos símbolos Proteus (thou)
+# Usada para:
+#   · Calcular espaçamento no placement (cell = maior dim + gap)
+#   · Estimar posição dos net labels relativos ao centro do componente
+#
+# pin_side:  "h" = pinos nas laterais esq/dir (ICs, resistores horizontais)
+#            "v" = pinos em cima/baixo (capacitores, LEDs, baterias)
+# ---------------------------------------------------------------------------
+PART_GEOM = {
+    "NE555":    {"w": 700,  "h": 1100, "side": "h"},
+    "LM741":    {"w": 700,  "h": 1100, "side": "h"},
+    "LM358":    {"w": 700,  "h": 900,  "side": "h"},
+    "BC547":    {"w": 400,  "h": 600,  "side": "h"},
+    "BC557":    {"w": 400,  "h": 600,  "side": "h"},
+    "RES":      {"w": 500,  "h": 100,  "side": "h"},
+    "INDUCTOR": {"w": 500,  "h": 100,  "side": "h"},
+    "CAP":      {"w": 100,  "h": 400,  "side": "v"},
+    "CAP-ELEC": {"w": 100,  "h": 400,  "side": "v"},
+    "LED":      {"w": 200,  "h": 500,  "side": "v"},
+    "DIODE":    {"w": 200,  "h": 400,  "side": "v"},
+    "ZENER":    {"w": 200,  "h": 400,  "side": "v"},
+    "BATTERY":  {"w": 200,  "h": 600,  "side": "v"},
+    "SW-SPST":  {"w": 500,  "h": 200,  "side": "h"},
+    "POT-HG":   {"w": 300,  "h": 500,  "side": "h"},
+}
+_GEOM_DEFAULT = {"w": 400, "h": 300, "side": "h"}
+
+_LABEL_GAP = 120   # thou do bounding-box até o label
 
 
 # ---------------------------------------------------------------------------
 # Utilitário JSON-RPC
 # ---------------------------------------------------------------------------
-
-def call(tool_name, args, timeout=15):
-    """Chama uma ferramenta MCP e retorna o resultado como dict Python."""
+def call(tool_name, args, timeout=20):
     payload = json.dumps({
         "jsonrpc": "2.0",
-        "method": "tools/call",
-        "params": {"name": tool_name, "arguments": args},
+        "method":  "tools/call",
+        "params":  {"name": tool_name, "arguments": args},
         "id": 1,
     }).encode()
     req = urllib.request.Request(
-        MCP_URL, data=payload,
-        headers={"Content-Type": "application/json"}
+        MCP_URL, data=payload, headers={"Content-Type": "application/json"}
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             result = json.loads(resp.read())
     except urllib.error.URLError as e:
-        raise RuntimeError(f"Erro ao conectar ao MCP (localhost:8001): {e}") from e
-
+        raise RuntimeError(f"MCP inacessível (localhost:8001): {e}") from e
     if "error" in result:
         raise RuntimeError(f"MCP erro: {result['error']}")
-
-    content = result["result"]["content"][0]
-    text = content.get("text", "")
+    text = result["result"]["content"][0].get("text", "")
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         return {"raw": text}
 
 
-# ---------------------------------------------------------------------------
-# Helpers Proteus
-# ---------------------------------------------------------------------------
-
 def get_status():
-    """Retorna (design_id, sheet_id) do projeto aberto."""
     r = call("get_current_status", {})
     s = r["data"]["status"]["schematic"]
     return s["current_design_id"], s["current_sheet_id"]
 
 
 def list_parts_bin(design_id):
-    """Retorna set de nomes de partes no parts bin."""
     r = call("schematic_list_parts_bin", {"id": design_id})
     return {item["name"] for item in r["data"]["contents"]}
 
 
 # ---------------------------------------------------------------------------
-# Adicionar partes ao parts bin via Pick Devices
+# Parts bin via Pick Devices
 # ---------------------------------------------------------------------------
-
-def _open_pick_devices():
-    """Abre o diálogo Pick Devices e retorna seu id."""
-    call("command_invoke", {"cmd_id": 336913})
-    time.sleep(1.5)
-    r = call("ui_last_dialog", {})
-    return r["data"]["active_modal"]["id"]
-
-
-def _find_control_in_tree(node, obj_name):
-    """Busca recursivamente um controle pelo objectName (usa 'children' do Proteus MCP)."""
+def _find_in_tree(node, obj_name):
     if not isinstance(node, dict):
         return None
     if node.get("object_name") == obj_name:
         return node
-    # O Proteus MCP usa a chave "children" para filhos de widgets
     for child in node.get("children", []):
-        found = _find_control_in_tree(child, obj_name)
+        found = _find_in_tree(child, obj_name)
         if found:
             return found
     return None
 
 
 def add_to_parts_bin(part_name, design_id):
-    """
-    Adiciona um componente ao parts bin via diálogo Pick Devices.
-    Usa window+objectName (sem IDs hardcoded) para máxima robustez.
-    """
     if part_name in list_parts_bin(design_id):
-        print(f"  ✓ {part_name} já está no parts bin")
+        print(f"  ✓ {part_name} já no parts bin")
         return True
 
-    search_keyword, cat_idx = PART_SEARCH_CONFIG.get(part_name, (part_name, 0))
-    print(f"  → Adicionando '{part_name}' (busca: '{search_keyword}')...")
+    kw, cat = PART_SEARCH_CONFIG.get(part_name, (part_name, 0))
+    print(f"  → Adicionando '{part_name}' (busca: '{kw}')...")
 
-    dlg_id = _open_pick_devices()
+    call("command_invoke", {"cmd_id": 336913})
+    time.sleep(1.5)
+    dlg_id = call("ui_last_dialog", {})["data"]["active_modal"]["id"]
 
     try:
-        # Desabilita filtros restritivos
         call("ui_act", {"window": dlg_id, "name": "wholeWordsCheck", "value": "false"})
         call("ui_act", {"window": dlg_id, "name": "managedCheck",    "value": "false"})
-
-        # Define categoria (se != All Categories)
-        if cat_idx > 0:
+        if cat > 0:
             call("ui_act", {"window": dlg_id, "name": "catList",
-                            "property": "currentRow", "value": str(cat_idx)})
+                            "property": "currentRow", "value": str(cat)})
             time.sleep(0.4)
+        call("ui_act", {"window": dlg_id, "name": "keywordsEdit", "value": kw})
+        time.sleep(1.0)
 
-        # Define keyword de busca
-        call("ui_act", {"window": dlg_id, "name": "keywordsEdit", "value": search_keyword})
-        time.sleep(1.0)  # aguarda tabela atualizar
+        r   = call("ui_describe", {"id": dlg_id, "depth": "full"})
+        ctrl = _find_in_tree(r.get("data", {}), "resList")
+        if ctrl is None:
+            raise RuntimeError("'resList' não encontrado")
 
-        # Obtém a tabela de resultados via describe
-        r = call("ui_describe", {"id": dlg_id, "depth": "full"})
-        res_ctrl = _find_control_in_tree(r.get("data", {}), "resList")
-
-        if res_ctrl is None:
-            raise RuntimeError(f"Controle 'resList' não encontrado no dialog {dlg_id}")
-
-        iv = res_ctrl.get("item_view", {})
+        iv   = ctrl.get("item_view", {})
         rows = iv.get("rows", 0)
         if rows == 0:
-            raise RuntimeError(
-                f"Nenhum resultado para '{search_keyword}'. "
-                f"Verifique PART_SEARCH_CONFIG para '{part_name}'."
-            )
+            raise RuntimeError(f"Sem resultados para '{kw}'")
 
-        # Encontra a linha com device name == part_name (DEVICE library)
-        target_row = 0
+        target = 0
         for i, item in enumerate(iv.get("items", [])):
-            cells = item.get("cells", [])
-            if cells and cells[0] == part_name:
-                target_row = i
+            if item.get("cells", [None])[0] == part_name:
+                target = i
                 break
 
-        print(f"    {rows} resultado(s) — selecionando linha {target_row}: "
-              f"{iv.get('items', [{}])[target_row:target_row+1]}")
-
-        call("ui_act", {"id": res_ctrl["id"], "property": "currentRow",
-                        "value": str(target_row)})
+        print(f"    {rows} resultado(s) → linha {target}")
+        call("ui_act", {"id": ctrl["id"], "property": "currentRow", "value": str(target)})
         time.sleep(0.3)
-
-        # Confirma
         call("ui_answer_dialog", {"id": dlg_id, "answer": "Ok"})
         time.sleep(0.5)
 
-        # Verifica
         if part_name in list_parts_bin(design_id):
-            print(f"  ✓ '{part_name}' adicionado com sucesso")
+            print(f"  ✓ '{part_name}' adicionado")
             return True
-
-        print(f"  ✗ '{part_name}' não apareceu no parts bin após OK")
+        print(f"  ✗ '{part_name}' não apareceu no parts bin")
         return False
 
     except Exception as e:
-        print(f"  ✗ Erro ao adicionar '{part_name}': {e}")
+        print(f"  ✗ Erro: {e}")
         try:
             call("ui_answer_dialog", {"id": dlg_id, "answer": "Cancel"})
         except Exception:
@@ -185,166 +188,315 @@ def add_to_parts_bin(part_name, design_id):
 
 
 # ---------------------------------------------------------------------------
-# Posicionamento de componentes
+# Placement topológico
 # ---------------------------------------------------------------------------
-
-def place_components(design_id, sheet_id, components):
+def build_topology(components, net_map):
     """
-    Posiciona todos os componentes em grade automática (4 colunas).
-    Retorna dict ref -> {x, y}.
+    net_map: dict net_name -> list[(ref, pin)]
+
+    Retorna dict ref -> (x, y) com placement BFS a partir do componente
+    de maior grau de conectividade.
     """
-    COL_W = 1100   # thou entre colunas
-    ROW_H = 1100   # thou entre linhas
-    COLS  = 4
-    X0    = 1500   # origem X
-    Y0    = 9000   # origem Y (Proteus: Y cresce para cima)
+    refs   = [c["ref"]  for c in components]
+    parts  = {c["ref"]: c["part"] for c in components}
 
-    placed = {}
-    for i, comp in enumerate(components):
-        col = i % COLS
-        row = i // COLS
-        x = X0 + col * COL_W
-        y = Y0 - row * ROW_H
+    # Grau: pares de refs que compartilham uma net
+    pair_w: dict[tuple, int] = {}
+    for pins in net_map.values():
+        refs_in_net = list({r for r, _ in pins})
+        for i in range(len(refs_in_net)):
+            for j in range(i + 1, len(refs_in_net)):
+                key = (min(refs_in_net[i], refs_in_net[j]),
+                       max(refs_in_net[i], refs_in_net[j]))
+                pair_w[key] = pair_w.get(key, 0) + 1
 
-        ref   = comp["ref"]
-        part  = comp["part"]
-        value = comp.get("value", "")
+    degree = {r: 0 for r in refs}
+    for (a, b), w in pair_w.items():
+        degree[a] += w
+        degree[b] += w
 
+    def cell(ref):
+        g = PART_GEOM.get(parts.get(ref, ""), _GEOM_DEFAULT)
+        return max(g["w"], g["h"]) + 700   # espaçamento mínimo
+
+    DIRS = [(1,0),(0,-1),(-1,0),(0,1),(1,-1),(-1,-1),(1,1),(-1,1)]
+    X0, Y0 = 4000, 9000
+    pos: dict[str, tuple] = {}
+    visited: set[str] = set()
+
+    anchor = max(refs, key=lambda r: degree.get(r, 0))
+    pos[anchor] = (X0, Y0)
+    visited.add(anchor)
+
+    queue = [anchor]
+    dir_idx = 0
+    while queue:
+        cur = queue.pop(0)
+        cx, cy = pos[cur]
+        cs = cell(cur)
+
+        # Vizinhos não visitados, ordenados por peso
+        nbrs = sorted(
+            [(r, pair_w.get((min(cur,r), max(cur,r)), 0))
+             for r in refs if r not in visited],
+            key=lambda x: -x[1]
+        )
+        nbrs = [r for r, w in nbrs if w > 0]
+
+        for nbr in nbrs:
+            if nbr in visited:
+                continue
+            ns   = cell(nbr)
+            step = max(cs, ns)
+            placed = False
+            for attempt in range(len(DIRS)):
+                dx, dy = DIRS[(dir_idx + attempt) % len(DIRS)]
+                nx, ny = cx + dx * step, cy + dy * step
+                if not any(
+                    abs(px - nx) < step * 0.75 and abs(py - ny) < step * 0.75
+                    for px, py in pos.values()
+                ):
+                    pos[nbr] = (nx, ny)
+                    visited.add(nbr)
+                    queue.append(nbr)
+                    dir_idx = (dir_idx + 1) % len(DIRS)
+                    placed = True
+                    break
+            if not placed:
+                fx = max(px for px, _ in pos.values()) + cs
+                pos[nbr] = (fx, Y0)
+                visited.add(nbr)
+                queue.append(nbr)
+
+    # Componentes sem conexão
+    x_cur = X0
+    for ref in refs:
+        if ref not in pos:
+            x_cur += 1200
+            pos[ref] = (x_cur, Y0 - 2500)
+
+    return pos
+
+
+def place_components(design_id, sheet_id, components, positions):
+    print("Posicionando componentes:")
+    for comp in components:
+        ref  = comp["ref"]
+        part = comp["part"]
+        val  = comp.get("value", "")
+        x, y = positions[ref]
         r = call("schematic_place_device", {
-            "id":        design_id,
-            "sheet":     sheet_id,
-            "name":      part,
-            "reference": ref,
-            "value":     value,
-            "x":         x,
-            "y":         y,
+            "id": design_id, "sheet": sheet_id,
+            "name": part, "reference": ref, "value": val,
+            "x": int(x), "y": int(y),
         })
-        placed[ref] = {"x": x, "y": y}
-
-        data     = r.get("data", {})
-        overlaps = data.get("overlaps", [])
+        overlaps = r.get("data", {}).get("overlaps", [])
         if overlaps:
-            print(f"  ⚠  {ref} sobrepõe: {[o['ref'] for o in overlaps]}")
+            print(f"  ⚠  {ref} ({part}) → ({int(x)},{int(y)})  "
+                  f"sobrepõe {[o['ref'] for o in overlaps]}")
         else:
-            print(f"  ✓  {ref} ({part}={value}) → ({x}, {y})")
-
-    return placed
+            print(f"  ✓  {ref} ({part}={val}) → ({int(x)},{int(y)})")
 
 
 # ---------------------------------------------------------------------------
-# Terminais de alimentação
+# Net labels
 # ---------------------------------------------------------------------------
-
-def place_power_terminals(design_id, sheet_id, power_nets, components, wires):
+def _label_xy(cx, cy, part, idx, total, side_hint=None):
     """
-    Coloca terminais POWER/GROUND para cada pino de alimentação no circuito.
-    Cada pino que participa de uma rede nomeada VCC ou GND recebe um terminal.
+    Calcula (lx, ly) para o net label do pino `idx` de um componente em (cx, cy).
+    Distribui os labels ao redor do símbolo evitando sobreposição.
     """
-    if not power_nets:
-        return
+    g    = PART_GEOM.get(part, _GEOM_DEFAULT)
+    side = side_hint or g["side"]
+    hw   = g["w"] // 2 + _LABEL_GAP
+    hh   = g["h"] // 2 + _LABEL_GAP
 
-    # Coleta pinos por rede
-    net_pins = {}
-    for wire in wires:
-        net = wire.get("net")
-        if not net or net not in power_nets:
-            continue
-        for endpoint in (wire["from"], wire["to"]):
-            ref, pin = endpoint["ref"], endpoint["pin"]
-            net_pins.setdefault(net, set()).add((ref, pin))
+    # Alternamos entre dois lados (esq/dir para "h", cima/baixo para "v")
+    # e deslocamos verticalmente (ou horizontalmente) para espalhar
+    spacing = 150
+    half    = max(total // 2, 1)
+    offset  = (idx // 2 - (half - 1) / 2) * spacing
 
-    # Posiciona terminais próximos a cada pino
-    comp_positions = {}  # rough positions — reais disponíveis após place_components
+    if side == "h":
+        dx = -hw if idx % 2 == 0 else hw
+        dy = int(offset)
+    else:
+        dy = -hh if idx % 2 == 0 else hh
+        dx = int(offset)
 
-    term_type = {"VCC": "POWER", "GND": "GROUND"}
+    return int(cx + dx), int(cy + dy)
 
-    # Um terminal por rede, posição fixa
-    TERM_X = {"VCC": 500, "GND": 500}
-    TERM_Y = {"VCC": 9700, "GND": 7000}
 
-    for net_name, voltage in power_nets.items():
-        ttype = "POWER" if voltage != 0 else "GROUND"
-        label = net_name
-        tx = TERM_X.get(net_name, 500)
-        ty = TERM_Y.get(net_name, 8000)
+def place_net_labels(design_id, sheet_id, netlist, components, positions, power_nets):
+    """
+    Para cada pino na tabela netlist, coloca um terminal com o nome da rede.
+      · POWER  → redes de alimentação positiva
+      · GROUND → redes de terra
+      · DEFAULT → sinais
+    Não precisa de fio — pinos com o mesmo nome de rede ficam conectados.
+    """
+    parts_map = {c["ref"]: c["part"] for c in components}
+
+    # Conta quantos pinos cada componente tem para distribuir offsets
+    pin_count: dict[str, int] = {}
+    for row in netlist:
+        pin_count[row["ref"]] = pin_count.get(row["ref"], 0) + 1
+
+    # Índice sequencial por componente (para o offset)
+    pin_idx: dict[str, int] = {}
+
+    ok = 0
+    fail = 0
+    print("Colocando net labels:")
+    for row in netlist:
+        ref  = row["ref"]
+        pin  = row["pin"]
+        net  = row["net"]
+        cx, cy = positions.get(ref, (4000, 9000))
+        part   = parts_map.get(ref, "")
+        idx    = pin_idx.get(ref, 0)
+        total  = pin_count.get(ref, 1)
+        pin_idx[ref] = idx + 1
+
+        if net in power_nets:
+            term = "POWER" if power_nets[net] != 0 else "GROUND"
+        else:
+            term = "DEFAULT"
+
+        lx, ly = _label_xy(cx, cy, part, idx, total)
 
         try:
             call("schematic_place_terminal", {
-                "id":       design_id,
-                "sheet":    sheet_id,
-                "terminal": ttype,
-                "label":    label,
-                "x":        tx,
-                "y":        ty,
+                "id": design_id, "sheet": sheet_id,
+                "terminal": term, "label": net,
+                "x": lx, "y": ly,
             })
-            print(f"  ✓  Terminal {ttype}:{label} → ({tx}, {ty})")
+            ok += 1
+            print(f"  ✓  {ref}.{pin} [{net}] ({term}) → ({lx},{ly})")
         except Exception as e:
-            print(f"  ⚠  Terminal {label}: {e}")
+            fail += 1
+            print(f"  ✗  {ref}.{pin} [{net}]: {e}")
+
+    # Âncoras de alimentação (símbolo central de VCC/GND)
+    anchors = {"VCC": (1800, 10600), "GND": (1800, 7400)}
+    for net, voltage in power_nets.items():
+        if net not in anchors:
+            continue
+        ax, ay = anchors[net]
+        ttype  = "POWER" if voltage != 0 else "GROUND"
+        try:
+            call("schematic_place_terminal", {
+                "id": design_id, "sheet": sheet_id,
+                "terminal": ttype, "label": net,
+                "x": ax, "y": ay,
+            })
+            print(f"  ✓  Âncora {ttype}:{net} → ({ax},{ay})")
+        except Exception as e:
+            print(f"  ⚠  Âncora {net}: {e}")
+
+    print(f"\n  Totais: {ok} OK  {fail} falhou")
+    return ok, fail
 
 
 # ---------------------------------------------------------------------------
-# Roteamento
+# Roteamento (conecta pinos aos labels próximos)
 # ---------------------------------------------------------------------------
-
-def build_route_nets(wires, power_nets=None):
+def route_all_nets(design_id, sheet_id, net_map, power_nets):
     """
-    Converte wires do JSON em estrutura para schematic_route_nets.
-    Agrupa por net name; wires sem net formam redes anônimas individuais.
+    Chama schematic_route_nets para todas as redes.
+    · Redes de alimentação: rota pino → terminal POWER/GROUND (funciona sempre)
+    · Redes de sinal: rota pino → pino direto (funciona se placement é compacto)
+      Se falhar, o net label DEFAULT garante a conectividade no simulador.
     """
-    net_map = {}  # net_name -> set of (ref, pin)
-    anon_id = [0]
-
-    def add_pin(net, ref, pin):
-        net_map.setdefault(net, set()).add((ref, pin))
-
-    for wire in wires:
-        net = wire.get("net") or f"_anon_{anon_id[0]}"
-        if not wire.get("net"):
-            anon_id[0] += 1
-        frm, to = wire["from"], wire["to"]
-        add_pin(net, frm["ref"], frm["pin"])
-        add_pin(net, to["ref"],  to["pin"])
-
     nets_out = []
-    for name, pins in net_map.items():
-        entry = {
-            "name": name,
-            "pins": [{"ref": r, "name": p} for r, p in pins],
-        }
-        # Adiciona terminais para redes de alimentação
-        if power_nets and name in power_nets:
-            ttype = "POWER" if power_nets[name] != 0 else "GROUND"
-            entry["terminals"] = [{"ref": ttype, "name": name}]
-
+    for net_name, pins in net_map.items():
+        unique_pins = list({(r, p) for r, p in pins})
+        if net_name in power_nets:
+            ttype = "POWER" if power_nets[net_name] != 0 else "GROUND"
+            entry = {
+                "name": net_name,
+                "pins": [{"ref": r, "name": p} for r, p in unique_pins],
+                "terminals": [{"ref": ttype, "name": net_name}],
+            }
+        else:
+            # Direto pino-a-pino; se falhar o DEFAULT label já está no schematic
+            entry = {
+                "name": net_name,
+                "pins": [{"ref": r, "name": p} for r, p in unique_pins],
+            }
         nets_out.append(entry)
 
-    return nets_out
+    if not nets_out:
+        return
+
+    r = call("schematic_route_nets", {
+        "id": design_id, "sheet": sheet_id,
+        "max_corners": 4, "nets": nets_out,
+    })
+    s = r.get("data", {}).get("summary", {})
+    print(f"  Roteamento — OK: {s.get('routed',0)}  "
+          f"Parcial: {s.get('partial',0)}  Falhou: {s.get('failed',0)}")
+
+    failed = r.get("data", {}).get("failed_nets", [])
+    if failed:
+        names = [n.get("name","?") for n in failed]
+        print(f"  ⚠  Não roteadas (serão conectadas via net label): {names}")
 
 
 # ---------------------------------------------------------------------------
-# Função principal
+# Pipeline principal
 # ---------------------------------------------------------------------------
-
 def build_circuit(json_path):
-    print(f"\n=== Construtor de Circuitos Proteus ===")
-    print(f"Arquivo: {json_path}\n")
+    print(f"\n{'='*52}")
+    print(f" MCP Builder — Proteus Circuit Builder")
+    print(f"{'='*52}")
+    print(f" Arquivo: {json_path}\n")
 
     with open(json_path, encoding="utf-8") as f:
         circuit = json.load(f)
 
-    print(f"Circuito: {circuit['name']}")
-    print(f"Descrição: {circuit.get('description', '')}\n")
+    # Aceita tanto o formato novo (netlist[]) quanto o antigo (wires[])
+    if "netlist" in circuit:
+        netlist = circuit["netlist"]
+        # Constrói net_map a partir da tabela
+        net_map: dict[str, list] = {}
+        for row in netlist:
+            net_map.setdefault(row["net"], []).append((row["ref"], row["pin"]))
+    elif "wires" in circuit:
+        # Compatibilidade retroativa com wires[]
+        wires   = circuit["wires"]
+        netlist = []
+        net_map = {}
+        seen: set[tuple] = set()
+        for wire in wires:
+            net = wire.get("net")
+            if not net:
+                continue
+            for ep in (wire["from"], wire["to"]):
+                key = (ep["ref"], ep["pin"])
+                if key not in seen:
+                    seen.add(key)
+                    netlist.append({"ref": ep["ref"], "pin": ep["pin"], "net": net})
+                net_map.setdefault(net, []).append((ep["ref"], ep["pin"]))
+    else:
+        print("✗ JSON não tem 'netlist' nem 'wires'")
+        return False
 
-    # 1. Conecta ao Proteus
+    power_nets = circuit.get("power_nets", {})
+    components = circuit["components"]
+
+    print(f" Circuito: {circuit['name']}")
+    print(f" Desc: {circuit.get('description','')}")
+    print(f" Componentes: {len(components)}  "
+          f"Pinos: {len(netlist)}  Nets: {len(net_map)}\n")
+
     design_id, sheet_id = get_status()
-    print(f"Design: {design_id}  Sheet: {sheet_id}\n")
+    print(f" Design: {design_id}  Sheet: {sheet_id}\n")
 
-    # 2. Parts bin
-    print("--- Parts bin ---")
-    needed  = {comp["part"] for comp in circuit["components"]}
-    in_bin  = list_parts_bin(design_id)
-    missing = needed - in_bin
-
+    # ── 1. Parts bin ──────────────────────────────────────────────────────
+    print("─── 1. Parts bin ───")
+    needed  = {c["part"] for c in components}
+    missing = needed - list_parts_bin(design_id)
     if missing:
         print(f"Faltando: {missing}")
         for part in sorted(missing):
@@ -352,64 +504,49 @@ def build_circuit(json_path):
     else:
         print("Todas as partes já estão no parts bin ✓")
 
-    in_bin = list_parts_bin(design_id)
-    still_missing = needed - in_bin
+    still_missing = needed - list_parts_bin(design_id)
     if still_missing:
-        print(f"\n✗ Partes ainda faltando: {still_missing}")
-        print("  Adicione manualmente: Library → Pick Device")
+        print(f"\n✗ Ainda faltam: {still_missing}  — abortando")
         return False
 
-    # 3. Transação de desenho
-    print("\n--- Desenhando ---")
+    # ── 2. Placement topológico ───────────────────────────────────────────
+    print("\n─── 2. Placement topológico ───")
+    positions = build_topology(components, net_map)
+
+    print(" Layout:")
+    for ref, (x, y) in sorted(positions.items()):
+        print(f"   {ref}: ({int(x)},{int(y)})")
+
     call("schematic_begin_transaction", {"id": design_id})
-    print("Transação iniciada\n")
+    print("\nTransação iniciada")
 
     try:
-        # 4. Componentes
-        print("Posicionando componentes:")
-        place_components(design_id, sheet_id, circuit["components"])
+        place_components(design_id, sheet_id, components, positions)
 
-        # 5. Terminais de alimentação (ANTES do roteamento)
-        print("\nTerminais de alimentação:")
-        place_power_terminals(
+        # ── 3. Net labels ─────────────────────────────────────────────────
+        print("\n─── 3. Net labels (conectores virtuais) ───")
+        place_net_labels(
             design_id, sheet_id,
-            circuit.get("power_nets", {}),
-            circuit["components"],
-            circuit["wires"],
+            netlist, components, positions, power_nets,
         )
 
-        # 6. Roteia
-        print("\nRoteando redes:")
-        nets = build_route_nets(circuit["wires"], circuit.get("power_nets", {}))
-        r = call("schematic_route_nets", {
-            "id":          design_id,
-            "sheet":       sheet_id,
-            "max_corners": 2,
-            "nets":        nets,
-        })
-        summary = r.get("data", {}).get("summary", {})
-        print(f"  OK: {summary.get('routed',0)}  "
-              f"Parcial: {summary.get('partial',0)}  "
-              f"Falhou: {summary.get('failed',0)}")
+        # ── 4. Roteamento ─────────────────────────────────────────────────
+        print("\n─── 4. Roteamento ───")
+        route_all_nets(design_id, sheet_id, net_map, power_nets)
 
-        # 7. Commit
-        r = call("schematic_end_transaction", {
-            "id":        design_id,
-            "auto_nudge": True,
-        })
+        # ── 5. Commit ─────────────────────────────────────────────────────
+        r = call("schematic_end_transaction", {"id": design_id, "auto_nudge": True})
         fouls = r.get("data", {}).get("block_placement", {}).get("fouls", [])
         if fouls:
-            print(f"  ⚠  Sobreposições: {[f['ref'] for f in fouls]}")
-        print("Transação finalizada ✓")
+            print(f"\n⚠  Sobreposições: {[f['ref'] for f in fouls]}")
+        print("\nTransação finalizada ✓")
 
-        # 8. Salva
         call("file_save", {})
-        print(f"\n✓ Circuito '{circuit['name']}' criado com sucesso!")
+        print(f"\n✓ '{circuit['name']}' criado com sucesso!")
         return True
 
     except Exception as e:
         print(f"\n✗ Erro: {e}")
-        print("Revertendo transação...")
         try:
             call("schematic_end_transaction", {"id": design_id, "abandon": True})
         except Exception:
@@ -418,15 +555,13 @@ def build_circuit(json_path):
 
 
 # ---------------------------------------------------------------------------
-
 def main():
-    parser = argparse.ArgumentParser(
-        description="Cria circuitos Proteus automaticamente a partir de JSON"
+    ap = argparse.ArgumentParser(
+        description="Cria circuitos Proteus a partir de JSON (netlist tabular)"
     )
-    parser.add_argument("json_file", help="Arquivo JSON do circuito")
-    args = parser.parse_args()
-    success = build_circuit(args.json_file)
-    sys.exit(0 if success else 1)
+    ap.add_argument("json_file", help="Arquivo JSON do circuito")
+    args = ap.parse_args()
+    sys.exit(0 if build_circuit(args.json_file) else 1)
 
 
 if __name__ == "__main__":
