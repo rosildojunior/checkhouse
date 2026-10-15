@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import winreg
+import glob
 from pathlib import Path
 
 PASTA_DESTINO = r"H:\Meu Drive\R&F CASA E ESTILO\RF - ARDUINO\PROTEUS - PROJETOS DE CIRCUITOS"
@@ -29,7 +30,6 @@ ok(f"Versão: {sys.version}")
 
 # ── 2. Dependências ───────────────────────────────────────────────────────────
 titulo("2. Dependências")
-
 try:
     import win32com.client
     ok("pywin32 instalado")
@@ -45,145 +45,171 @@ except ImportError:
 # ── 3. Pasta de destino ───────────────────────────────────────────────────────
 titulo("3. Pasta de destino")
 if os.path.exists(PASTA_DESTINO):
-    ok(f"Pasta existe: {PASTA_DESTINO}")
-    # Testa escrita
+    ok(f"Pasta existe")
     teste = os.path.join(PASTA_DESTINO, "__teste_builder__.tmp")
     try:
-        with open(teste, 'w') as f:
-            f.write("ok")
+        with open(teste, 'w') as f: f.write("ok")
         os.remove(teste)
         ok("Permissão de escrita: OK")
     except Exception as e:
         erro(f"Sem permissão de escrita: {e}")
 else:
     erro(f"Pasta NÃO encontrada: {PASTA_DESTINO}")
-    info("Verifique se o Google Drive está sincronizado e a letra H: está ativa")
 
-# ── 4. Registro COM — busca entradas do Proteus ───────────────────────────────
-titulo("4. COM — Entradas do Proteus no Registro")
+# ── 4. Localização do Proteus ─────────────────────────────────────────────────
+titulo("4. Instalação do Proteus")
 
-encontrados = []
-prefixos = ['proteus', 'labcenter', 'isis', 'ares', 'pds']
-
-try:
-    chave = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, "")
-    i = 0
-    while True:
-        try:
-            nome = winreg.EnumKey(chave, i)
-            if any(p in nome.lower() for p in prefixos):
-                encontrados.append(nome)
-            i += 1
-        except OSError:
-            break
-except Exception as e:
-    erro(f"Não foi possível ler o registro: {e}")
-
-if encontrados:
-    ok(f"{len(encontrados)} entrada(s) encontrada(s):")
-    for e in encontrados:
-        print(f"       {e}")
-else:
-    erro("Nenhuma entrada COM do Proteus encontrada no registro")
-    info("O Proteus pode não estar instalado ou o COM não foi registrado")
-
-# ── 5. Tenta conectar ao Proteus via COM ──────────────────────────────────────
-titulo("5. Conexão COM com o Proteus")
-
-PROGIDS = [
-    "Labcenter.ProteusIDE",
-    "Labcenter.Proteus",
-    "ISIS.Application",
-    "ProteusAutomate.Application",
-    "Labcenter.Schematic",
+PASTAS_POSSIVEIS = [
+    r"C:\Program Files (x86)\Labcenter Electronics",
+    r"C:\Program Files\Labcenter Electronics",
+    r"C:\Labcenter Electronics",
+    r"D:\Program Files (x86)\Labcenter Electronics",
+    r"D:\Labcenter Electronics",
 ]
 
-conectou = False
+pasta_proteus = None
+exe_proteus   = None
+
+for base in PASTAS_POSSIVEIS:
+    if os.path.exists(base):
+        ok(f"Encontrado em: {base}")
+        pasta_proteus = base
+        # Procura o executável ISIS.EXE
+        for exe in glob.glob(os.path.join(base, "**", "ISIS.EXE"), recursive=True):
+            exe_proteus = exe
+            ok(f"ISIS.EXE: {exe}")
+            break
+        # Procura type library
+        for tlb in glob.glob(os.path.join(base, "**", "*.TLB"), recursive=True):
+            ok(f"Type library: {tlb}")
+        # Procura SAMPLES de automação
+        for s in glob.glob(os.path.join(base, "**", "Automation"), recursive=True):
+            ok(f"Pasta Automation: {s}")
+        break
+
+if not pasta_proteus:
+    erro("Pasta Labcenter Electronics não encontrada")
+    info("Verifique onde o Proteus está instalado")
+
+# Também verifica o registro para caminho de instalação
+try:
+    for root in [winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER]:
+        for sub in [
+            r"SOFTWARE\Labcenter Electronics\Proteus 8 Professional",
+            r"SOFTWARE\WOW6432Node\Labcenter Electronics\Proteus 8 Professional",
+            r"SOFTWARE\Labcenter Electronics",
+        ]:
+            try:
+                key = winreg.OpenKey(root, sub)
+                i = 0
+                while True:
+                    try:
+                        name, val, _ = winreg.EnumValue(key, i)
+                        info(f"Registro [{sub}] {name} = {val}")
+                        i += 1
+                    except OSError:
+                        break
+            except Exception:
+                pass
+except Exception as e:
+    info(f"Registro: {e}")
+
+# ── 5. COM — PDS.ImportServer ─────────────────────────────────────────────────
+titulo("5. COM — PDS.ImportServer")
 try:
     import win32com.client
-    for progid in PROGIDS:
+
+    for progid in ["PDS.ImportServer.1", "PDS.ImportServer"]:
         try:
-            win32com.client.GetActiveObject(progid)
-            ok(f"Proteus em execução encontrado: {progid}")
-            conectou = True
+            srv = win32com.client.Dispatch(progid)
+            ok(f"Conectado: {progid}")
+            metodos = [m for m in dir(srv) if not m.startswith('_')]
+            info(f"Métodos/propriedades: {metodos}")
             break
+        except Exception as e:
+            info(f"  Falhou {progid}: {e}")
+except Exception as e:
+    erro(f"Erro ao testar PDS.ImportServer: {e}")
+
+# ── 6. COM — busca TODOS os ProgIDs que têm CLSID ────────────────────────────
+titulo("6. ProgIDs COM completos do Proteus")
+try:
+    encontrados = []
+    for hive, nome_hive in [(winreg.HKEY_CLASSES_ROOT, "HKCR"),
+                            (winreg.HKEY_LOCAL_MACHINE, "HKLM")]:
+        try:
+            chave = winreg.OpenKey(hive, "")
+            i = 0
+            while True:
+                try:
+                    nome = winreg.EnumKey(chave, i)
+                    if any(p in nome.lower() for p in ['proteus','labcenter','isis','ares','pds']):
+                        # Verifica se tem CLSID (é um ProgID real)
+                        try:
+                            sub = winreg.OpenKey(hive, nome + "\\CLSID")
+                            clsid = winreg.QueryValue(sub, "")
+                            encontrados.append(f"{nome_hive}\\{nome}  →  CLSID={clsid}")
+                        except Exception:
+                            encontrados.append(f"{nome_hive}\\{nome}  (sem CLSID)")
+                    i += 1
+                except OSError:
+                    break
         except Exception:
             pass
 
-    if not conectou:
-        info("Proteus não está em execução. Tentando iniciar...")
-        for progid in PROGIDS:
-            try:
-                win32com.client.Dispatch(progid)
-                ok(f"Proteus iniciado via COM: {progid}")
-                conectou = True
-                break
-            except Exception as e:
-                info(f"  Falhou {progid}: {e}")
-
-    if not conectou:
-        erro("Não foi possível conectar via nenhum ProgID conhecido")
-
-except Exception as e:
-    erro(f"Erro na tentativa COM: {e}")
-
-# ── 6. Clipboard ──────────────────────────────────────────────────────────────
-titulo("6. Área de Transferência")
-try:
-    import pyperclip
-    conteudo = pyperclip.paste()
-    if conteudo:
-        preview = conteudo[:80].replace('\n', ' ')
-        ok(f"Leitura OK. Conteúdo atual: {preview}...")
+    if encontrados:
+        ok(f"{len(encontrados)} entradas:")
+        for e in encontrados:
+            print(f"       {e}")
     else:
-        info("Área de transferência vazia")
+        erro("Nenhuma encontrada")
 except Exception as e:
-    erro(f"Erro ao ler clipboard: {e}")
+    erro(f"Erro: {e}")
 
-# ── 7. Arquivo de teste na pasta ──────────────────────────────────────────────
-titulo("7. Teste de salvamento de JSON na pasta")
+# ── 7. Proteus em execução — janela ativa ─────────────────────────────────────
+titulo("7. Processos Proteus em execução")
+try:
+    import subprocess
+    result = subprocess.run(
+        ["tasklist", "/FI", "IMAGENAME eq ISIS.EXE"],
+        capture_output=True, text=True
+    )
+    if "ISIS.EXE" in result.stdout:
+        ok("ISIS.EXE está em execução")
+        print(f"       {result.stdout.strip()}")
+    else:
+        info("ISIS.EXE não está em execução")
+
+    result2 = subprocess.run(
+        ["tasklist", "/FI", "IMAGENAME eq Proteus.exe"],
+        capture_output=True, text=True
+    )
+    if "Proteus.exe" in result2.stdout:
+        ok("Proteus.exe está em execução")
+    else:
+        info("Proteus.exe não está em execução")
+except Exception as e:
+    info(f"Não foi possível listar processos: {e}")
+
+# ── 8. Teste de salvamento de JSON ────────────────────────────────────────────
+titulo("8. Teste de salvamento de JSON na pasta")
 if os.path.exists(PASTA_DESTINO):
     circuito_teste = {
         "name": "Teste Diagnóstico",
-        "description": "Arquivo de teste gerado pelo diagnóstico",
+        "description": "Arquivo de teste",
         "supply_voltage": 5,
-        "components": [
-            {"ref": "R1", "part": "RES", "value": "1k"}
-        ],
+        "components": [{"ref": "R1", "part": "RES", "value": "1k"}],
         "wires": []
     }
     arquivo_teste = os.path.join(PASTA_DESTINO, "__teste_diagnostico__.json")
     try:
         with open(arquivo_teste, 'w', encoding='utf-8') as f:
             json.dump(circuito_teste, f, ensure_ascii=False, indent=2)
-        ok(f"JSON de teste salvo em: {arquivo_teste}")
-        info("Se o builder estiver rodando, ele deve processar este arquivo agora")
+        ok(f"JSON salvo com sucesso")
     except Exception as e:
-        erro(f"Falha ao salvar JSON de teste: {e}")
+        erro(f"Falha: {e}")
 
 # ── Resumo ────────────────────────────────────────────────────────────────────
-titulo("RESUMO")
-if not conectou:
-    print("""
-  O principal problema é a conexão COM com o Proteus.
-
-  Soluções para tentar:
-
-  1. Execute o Proteus como ADMINISTRADOR e deixe aberto
-     depois rode este diagnóstico novamente
-
-  2. Registre o COM manualmente:
-     - Abra o CMD como Administrador
-     - Vá até a pasta de instalação do Proteus, ex:
-       cd "C:\\Program Files (x86)\\Labcenter Electronics\\Proteus 8 Professional\\BIN"
-     - Execute: regsvr32 ISIS.EXE
-
-  3. Informe a versão exata do Proteus instalada
-     (Help → About no menu do Proteus)
-""")
-else:
-    ok("Sistema pronto para uso!")
-
-print(SEP)
+titulo("RESUMO — Cole tudo acima e envie para análise")
 print()
 input("Pressione Enter para fechar...")
