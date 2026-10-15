@@ -40,8 +40,11 @@ PART_SEARCH_CONFIG = {
     "DIODE":     ("Generic signal diode",      0),
     "ZENER":     ("Generic zener diode",       0),
     "SW-SPST":   ("Single pole single throw",  0),
-    "POT-HG":    ("Variable resistor",         0),
-    "INDUCTOR":  ("Generic inductor",          0),
+    "POT-HG":        ("Variable resistor",         0),
+    "INDUCTOR":      ("Generic inductor",          0),
+    "ARDUINO-NANO":  ("Arduino Nano",              0),
+    "ARDUINO-UNO":   ("Arduino Uno",               0),
+    "ARDUINO-MEGA":  ("Arduino Mega",              0),
 }
 
 # ---------------------------------------------------------------------------
@@ -67,8 +70,11 @@ PART_GEOM = {
     "DIODE":    {"w": 200,  "h": 400,  "side": "v"},
     "ZENER":    {"w": 200,  "h": 400,  "side": "v"},
     "BATTERY":  {"w": 200,  "h": 600,  "side": "v"},
-    "SW-SPST":  {"w": 500,  "h": 200,  "side": "h"},
-    "POT-HG":   {"w": 300,  "h": 500,  "side": "h"},
+    "SW-SPST":       {"w": 500,  "h": 200,  "side": "h"},
+    "POT-HG":        {"w": 300,  "h": 500,  "side": "h"},
+    "ARDUINO-NANO":  {"w": 600,  "h": 1600, "side": "h"},
+    "ARDUINO-UNO":   {"w": 900,  "h": 1400, "side": "h"},
+    "ARDUINO-MEGA":  {"w": 900,  "h": 2200, "side": "h"},
 }
 _GEOM_DEFAULT = {"w": 400, "h": 300, "side": "h"}
 
