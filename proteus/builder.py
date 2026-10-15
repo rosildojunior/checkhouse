@@ -1,474 +1,433 @@
+#!/usr/bin/env python3
 """
-Proteus Circuit Builder
-=======================
-Lê um JSON de circuito gerado pelo Claude e cria o esquemático no Proteus via COM.
+builder.py — Cria circuitos Proteus automaticamente a partir de um arquivo JSON.
+Usa o servidor MCP nativo do Proteus ProPilot via JSON-RPC 2.0.
 
 Uso:
-    python builder.py circuito.json
-    python builder.py circuito.json saida.pdsprj
-    python builder.py --watch pasta/    # monitora pasta e executa automaticamente
-
-Requisitos:
-    pip install pywin32
-    Proteus 8.x instalado no Windows
+    python builder.py caminho/para/circuito.json
 """
 
-import json
 import sys
-import os
+import json
 import time
-import math
+import urllib.request
+import urllib.error
 import argparse
-import traceback
-from pathlib import Path
-from typing import Optional, Tuple, Dict
 
-# ── COM availability ──────────────────────────────────────────────────────────
-try:
-    import win32com.client
-    import pywintypes
-    COM_AVAILABLE = True
-except ImportError:
-    COM_AVAILABLE = False
+MCP_URL = "http://localhost:8001"
 
-# ── Mapeamento de componentes para biblioteca Proteus ──────────────────────────
-# Formato: 'NOME_GENERICO': ('BIBLIOTECA', 'PARTE')
-LIBRARY_MAP = {
-    # Passivos
-    'RES':          ('DEVICE', 'RES'),
-    'RESISTOR':     ('DEVICE', 'RES'),
-    'R':            ('DEVICE', 'RES'),
-    'CAP':          ('DEVICE', 'CAP'),
-    'CAPACITOR':    ('DEVICE', 'CAP'),
-    'C':            ('DEVICE', 'CAP'),
-    'CAP-ELEC':     ('DEVICE', 'CAP-ELEC'),
-    'CAP_ELEC':     ('DEVICE', 'CAP-ELEC'),
-    'INDUCTOR':     ('DEVICE', 'INDUCTOR'),
-    'L':            ('DEVICE', 'INDUCTOR'),
-    'XTAL':         ('DEVICE', 'CRYSTAL'),
-    'CRYSTAL':      ('DEVICE', 'CRYSTAL'),
-    'TRANSFORMER':  ('DEVICE', 'TRAN-2P2S'),
-
-    # Diodos / LEDs
-    'DIODE':        ('DEVICE', '1N4148'),
-    '1N4148':       ('DEVICE', '1N4148'),
-    '1N4007':       ('DEVICE', '1N4007'),
-    '1N5408':       ('DEVICE', '1N5408'),
-    'ZENER':        ('DEVICE', 'ZENER'),
-    'LED':          ('DEVICE', 'LED'),
-    'LED-RED':      ('OPTOELECTRONICS', 'LED-RED'),
-    'LED-GREEN':    ('OPTOELECTRONICS', 'LED-GREEN'),
-    'LED-BLUE':     ('OPTOELECTRONICS', 'LED-BLUE'),
-    'LED-YELLOW':   ('OPTOELECTRONICS', 'LED-YELLOW'),
-
-    # Transistores BJT
-    'NPN':          ('DEVICE', 'NPN'),
-    'PNP':          ('DEVICE', 'PNP'),
-    'BC547':        ('TRANSISTORS', 'BC547'),
-    'BC557':        ('TRANSISTORS', 'BC557'),
-    'BC337':        ('TRANSISTORS', 'BC337'),
-    'BC327':        ('TRANSISTORS', 'BC327'),
-    '2N2222':       ('TRANSISTORS', '2N2222A'),
-    '2N3904':       ('TRANSISTORS', '2N3904'),
-    '2N3906':       ('TRANSISTORS', '2N3906'),
-    'TIP31':        ('TRANSISTORS', 'TIP31C'),
-    'TIP32':        ('TRANSISTORS', 'TIP32C'),
-    'TIP41':        ('TRANSISTORS', 'TIP41C'),
-    'BD135':        ('TRANSISTORS', 'BD135'),
-    'BD136':        ('TRANSISTORS', 'BD136'),
-    'BC639':        ('TRANSISTORS', 'BC639'),
-
-    # MOSFETs
-    'NMOS':         ('DEVICE', 'NMOS'),
-    'PMOS':         ('DEVICE', 'PMOS'),
-    'IRF540':       ('MOSFET', 'IRF540N'),
-    'IRF9540':      ('MOSFET', 'IRF9540N'),
-
-    # Temporizadores / analógicos
-    '555':          ('DEVICE', '555'),
-    'NE555':        ('DEVICE', '555'),
-    'LM555':        ('DEVICE', '555'),
-    'LM741':        ('ANALOG', 'LM741'),
-    'LM358':        ('ANALOG', 'LM358'),
-    'LM324':        ('ANALOG', 'LM324'),
-    'LM393':        ('ANALOG', 'LM393'),
-    'LM339':        ('ANALOG', 'LM339'),
-    'TL071':        ('ANALOG', 'TL071'),
-    'TL072':        ('ANALOG', 'TL072'),
-    'TL082':        ('ANALOG', 'TL082'),
-    'NE5532':       ('ANALOG', 'NE5532'),
-
-    # Reguladores de tensão
-    '7805':         ('DEVICE', '7805'),
-    '7809':         ('DEVICE', '7809'),
-    '7812':         ('DEVICE', '7812'),
-    '7815':         ('DEVICE', '7815'),
-    '7905':         ('DEVICE', '7905'),
-    '7912':         ('DEVICE', '7912'),
-    'LM317':        ('DEVICE', 'LM317'),
-    'LM337':        ('DEVICE', 'LM337'),
-    'LM7805':       ('DEVICE', '7805'),
-    'LM7812':       ('DEVICE', '7812'),
-
-    # Lógica TTL
-    '74LS00':       ('74LS', '74LS00'),
-    '74LS04':       ('74LS', '74LS04'),
-    '74LS08':       ('74LS', '74LS08'),
-    '74LS32':       ('74LS', '74LS32'),
-    '74LS74':       ('74LS', '74LS74'),
-    '74LS138':      ('74LS', '74LS138'),
-    '74LS245':      ('74LS', '74LS245'),
-    '74LS373':      ('74LS', '74LS373'),
-    '74HC00':       ('74HC', '74HC00'),
-    '74HC04':       ('74HC', '74HC04'),
-    '74HC08':       ('74HC', '74HC08'),
-    '74HC32':       ('74HC', '74HC32'),
-    '74HC74':       ('74HC', '74HC74'),
-    '74HC138':      ('74HC', '74HC138'),
-    '74HC245':      ('74HC', '74HC245'),
-    '74HC373':      ('74HC', '74HC373'),
-
-    # Microcontroladores
-    'ATMEGA328P':   ('AVR', 'ATMEGA328P-PU'),
-    'ATMEGA328':    ('AVR', 'ATMEGA328P-PU'),
-    'ATMEGA2560':   ('AVR', 'ATMEGA2560'),
-    'ATTINY85':     ('AVR', 'ATTINY85-20PU'),
-    'PIC16F877A':   ('PIC16', 'PIC16F877A'),
-    'PIC16F628A':   ('PIC16', 'PIC16F628A'),
-    'PIC18F4550':   ('PIC18', 'PIC18F4550'),
-    'STM32F103':    ('STM32', 'STM32F103C8'),
-
-    # Displays
-    'LCD16X2':      ('DISPLAY', 'LM016L'),
-    'LCD_16X2':     ('DISPLAY', 'LM016L'),
-    '7SEG':         ('DISPLAY', '7SEG-MPX1-CC'),
-    '7SEG_CA':      ('DISPLAY', '7SEG-MPX1-CA'),
-
-    # Conectores / terminais
-    'CONN1':        ('DEVICE', 'CONN-H1'),
-    'CONN2':        ('DEVICE', 'CONN-H2'),
-    'CONN3':        ('DEVICE', 'CONN-H3'),
-    'CONN4':        ('DEVICE', 'CONN-H4'),
-    'CONN5':        ('DEVICE', 'CONN-H5'),
-    'CONN6':        ('DEVICE', 'CONN-H6'),
-    'TERMINAL2':    ('DEVICE', 'TERMINAL'),
-    'TERMINAL3':    ('DEVICE', 'TERMINAL'),
-
-    # Chaves / botões
-    'SW':           ('DEVICE', 'SW-SPST'),
-    'PUSH':         ('ACTIVE', 'BUTTON'),
-    'BUTTON':       ('ACTIVE', 'BUTTON'),
-    'RELAY':        ('DEVICE', 'RELAY-SPDT'),
-
-    # Transformadores / retificadores
-    'BRIDGE':       ('DEVICE', 'BRIDGE'),
-    'BRIDGE1':      ('DEVICE', 'BRIDGE'),
-
-    # Medição (virtual instruments Proteus)
-    'VOLTMETER':    ('ACTIVE', 'VOLTMETER'),
-    'AMMETER':      ('ACTIVE', 'AMMETER'),
-    'OSCILLOSCOPE': ('ACTIVE', 'OSCILLOSCOPE'),
-    'LOGICANALYZER':('ACTIVE', 'LOGICANALYZER'),
-
-    # Fontes
-    'VSOURCE':      ('DEVICE', 'VSOURCE'),
-    'ISOURCE':      ('DEVICE', 'ISOURCE'),
-    'VSIN':         ('DEVICE', 'VSIN'),
-    'BATTERY':      ('DEVICE', 'BATTERY'),
+# Mapeamento: nome do part -> (keyword de busca, índice de categoria)
+# Índice 0 = (All Categories), 26 = Simulator Primitives, 3 = Analog ICs
+PART_SEARCH_CONFIG = {
+    "RES":      ("Generic resistor symbol",   0),
+    "CAP":      ("Generic capacitor",         0),
+    "CAP-ELEC": ("Electrolytic capacitor",    0),
+    "LED":      ("Light emitting diode",      0),
+    "BATTERY":  ("DC Voltage Source",        26),
+    "NE555":    ("NE555",                     0),
 }
 
-# ── COM ProgIDs do Proteus (tenta em ordem) ────────────────────────────────────
-PROTEUS_PROGIDS = [
-    "Labcenter.ProteusIDE",
-    "Labcenter.Proteus",
-    "ISIS.Application",
-    "ProteusAutomate.Application",
-    "Labcenter.Schematic",
-]
+
+# ---------------------------------------------------------------------------
+# Utilitário JSON-RPC
+# ---------------------------------------------------------------------------
+
+def call(tool_name, args, timeout=15):
+    """Chama uma ferramenta MCP e retorna o resultado como dict Python."""
+    payload = json.dumps({
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {"name": tool_name, "arguments": args},
+        "id": 1,
+    }).encode()
+    req = urllib.request.Request(
+        MCP_URL, data=payload,
+        headers={"Content-Type": "application/json"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            result = json.loads(resp.read())
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"Erro ao conectar ao MCP (localhost:8001): {e}") from e
+
+    if "error" in result:
+        raise RuntimeError(f"MCP erro: {result['error']}")
+
+    content = result["result"]["content"][0]
+    text = content.get("text", "")
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"raw": text}
 
 
-# ── Auto-layout ────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# Helpers Proteus
+# ---------------------------------------------------------------------------
 
-class AutoLayout:
+def get_status():
+    """Retorna (design_id, sheet_id) do projeto aberto."""
+    r = call("get_current_status", {})
+    s = r["data"]["status"]["schematic"]
+    return s["current_design_id"], s["current_sheet_id"]
+
+
+def list_parts_bin(design_id):
+    """Retorna set de nomes de partes no parts bin."""
+    r = call("schematic_list_parts_bin", {"id": design_id})
+    return {item["name"] for item in r["data"]["contents"]}
+
+
+# ---------------------------------------------------------------------------
+# Adicionar partes ao parts bin via Pick Devices
+# ---------------------------------------------------------------------------
+
+def _open_pick_devices():
+    """Abre o diálogo Pick Devices e retorna seu id."""
+    call("command_invoke", {"cmd_id": 336913})
+    time.sleep(1.5)
+    r = call("ui_last_dialog", {})
+    return r["data"]["active_modal"]["id"]
+
+
+def _find_control_in_tree(node, obj_name):
+    """Busca recursivamente um controle pelo objectName (usa 'children' do Proteus MCP)."""
+    if not isinstance(node, dict):
+        return None
+    if node.get("object_name") == obj_name:
+        return node
+    # O Proteus MCP usa a chave "children" para filhos de widgets
+    for child in node.get("children", []):
+        found = _find_control_in_tree(child, obj_name)
+        if found:
+            return found
+    return None
+
+
+def add_to_parts_bin(part_name, design_id):
     """
-    Layout automático simples: distribui componentes em grade.
-    Respeita posições explícitas no JSON; preenche o resto em grade.
+    Adiciona um componente ao parts bin via diálogo Pick Devices.
+    Usa window+objectName (sem IDs hardcoded) para máxima robustez.
     """
-    COLS = 5
-    STEP_X = 1500   # unidades Proteus (~1 inch = 1000 unis dependendo da versão)
-    STEP_Y = 1200
-    ORIGIN_X = 2000
-    ORIGIN_Y = 2000
+    if part_name in list_parts_bin(design_id):
+        print(f"  ✓ {part_name} já está no parts bin")
+        return True
 
-    def apply(self, components: list) -> list:
-        col, row = 0, 0
-        result = []
-        for comp in components:
-            c = dict(comp)
-            if not c.get('position'):
-                c['position'] = {
-                    'x': self.ORIGIN_X + col * self.STEP_X,
-                    'y': self.ORIGIN_Y + row * self.STEP_Y,
-                }
-                col += 1
-                if col >= self.COLS:
-                    col = 0
-                    row += 1
-            result.append(c)
-        return result
+    search_keyword, cat_idx = PART_SEARCH_CONFIG.get(part_name, (part_name, 0))
+    print(f"  → Adicionando '{part_name}' (busca: '{search_keyword}')...")
 
-
-# ── Proteus COM Builder ────────────────────────────────────────────────────────
-
-class ProteusComBuilder:
-
-    def __init__(self):
-        self.app = None
-        self.design = None
-        self.sheet = None
-
-    # ── Conexão ──────────────────────────────────────────────────────────────
-
-    def connect(self) -> bool:
-        if not COM_AVAILABLE:
-            _error("pywin32 não encontrado. Instale com: pip install pywin32")
-            return False
-
-        # Tenta conectar a instância em execução
-        for progid in PROTEUS_PROGIDS:
-            try:
-                self.app = win32com.client.GetActiveObject(progid)
-                _info(f"Conectado ao Proteus em execução ({progid})")
-                return True
-            except Exception:
-                pass
-
-        # Tenta iniciar nova instância
-        for progid in PROTEUS_PROGIDS:
-            try:
-                self.app = win32com.client.Dispatch(progid)
-                _info(f"Proteus iniciado ({progid})")
-                return True
-            except Exception:
-                pass
-
-        _error(
-            "Não foi possível conectar ao Proteus.\n"
-            "Verifique:\n"
-            "  1. Proteus 8.x está instalado\n"
-            "  2. Execute Proteus ao menos uma vez como Administrador\n"
-            "  3. Registre o COM: 'cd C:\\Program Files (x86)\\Labcenter Electronics\\Proteus 8 Professional\\BIN'\n"
-            "     depois: 'regsvr32 ISIS.EXE' (ou ProSPICE.EXE)"
-        )
-        return False
-
-    # ── Build principal ───────────────────────────────────────────────────────
-
-    def build(self, circuit: dict, output_path: Optional[str] = None) -> bool:
-        if not self.connect():
-            return False
-
-        try:
-            _info("Criando novo design...")
-            self.design = self.app.NewDesign()
-            self.sheet = self.design.RootSheet
-
-            layout = AutoLayout()
-            components = layout.apply(circuit['components'])
-
-            # Coloca componentes
-            placed: Dict[str, object] = {}
-            for comp in components:
-                obj = self._place_component(comp)
-                if obj is not None:
-                    placed[comp['ref']] = obj
-                else:
-                    _warn(f"  Pulando fios de {comp['ref']} (não foi colocado)")
-
-            _info(f"Componentes colocados: {len(placed)}/{len(components)}")
-
-            # Desenha fios
-            wires_ok = 0
-            for wire in circuit.get('wires', []):
-                if self._draw_wire(wire, placed):
-                    wires_ok += 1
-
-            _info(f"Fios desenhados: {wires_ok}/{len(circuit.get('wires', []))}")
-
-            # Salva
-            if output_path:
-                self.design.SaveAs(os.path.abspath(output_path))
-                _info(f"Salvo em: {output_path}")
-            else:
-                self.design.Save()
-
-            return True
-
-        except Exception as e:
-            _error(f"Erro ao construir circuito: {e}")
-            traceback.print_exc()
-            return False
-
-    # ── Colocação de componente ───────────────────────────────────────────────
-
-    def _place_component(self, comp: dict) -> Optional[object]:
-        lib, part = self._resolve_part(comp)
-        pos = comp['position']
-        rot = comp.get('rotation', 0)
-
-        try:
-            # API do Proteus pode variar entre versões
-            try:
-                obj = self.sheet.PlaceComponent(lib, part, pos['x'], pos['y'], rot)
-            except AttributeError:
-                obj = self.sheet.AddComponent(lib, part, pos['x'], pos['y'], rot)
-
-            # RefDes
-            try:
-                obj.RefDes = comp['ref']
-            except AttributeError:
-                obj.Reference = comp['ref']
-
-            # Valor
-            val = comp.get('value', '')
-            if val:
-                try:
-                    obj.SetProperty('VALUE', str(val))
-                except Exception:
-                    try:
-                        obj.Value = str(val)
-                    except Exception:
-                        pass
-
-            _info(f"  + {comp['ref']} ({lib}:{part})  pos=({pos['x']},{pos['y']})")
-            return obj
-
-        except Exception as e:
-            _warn(f"  ! Falha ao colocar {comp['ref']} ({lib}:{part}): {e}")
-            return None
-
-    # ── Fio ──────────────────────────────────────────────────────────────────
-
-    def _draw_wire(self, wire: dict, placed: dict) -> bool:
-        from_ref = wire['from']['ref']
-        to_ref   = wire['to']['ref']
-        from_pin = str(wire['from']['pin'])
-        to_pin   = str(wire['to']['pin'])
-
-        obj_from = placed.get(from_ref)
-        obj_to   = placed.get(to_ref)
-
-        if obj_from is None or obj_to is None:
-            _warn(f"  ! Fio ignorado: {from_ref}.{from_pin} → {to_ref}.{to_pin} (componente ausente)")
-            return False
-
-        try:
-            pin_from = obj_from.GetPin(from_pin)
-            pin_to   = obj_to.GetPin(to_pin)
-
-            if pin_from is None or pin_to is None:
-                _warn(f"  ! Pin não encontrado: {from_ref}.{from_pin} ou {to_ref}.{to_pin}")
-                return False
-
-            self.sheet.DrawWire(pin_from.X, pin_from.Y, pin_to.X, pin_to.Y)
-            return True
-
-        except Exception as e:
-            _warn(f"  ! Erro ao desenhar fio {from_ref}.{from_pin}→{to_ref}.{to_pin}: {e}")
-            return False
-
-    # ── Resolução de biblioteca ───────────────────────────────────────────────
-
-    def _resolve_part(self, comp: dict) -> Tuple[str, str]:
-        # Se veio explícito no JSON, usa direto
-        if comp.get('library') and comp.get('part'):
-            return comp['library'], comp['part']
-
-        # Tenta resolver pelo campo 'part' ou 'type'
-        key = comp.get('part', comp.get('type', '')).upper().strip()
-        if key in LIBRARY_MAP:
-            return LIBRARY_MAP[key]
-
-        # Sem mapeamento: assume DEVICE
-        _warn(f"  ? Componente '{key}' não mapeado — tentando biblioteca DEVICE")
-        return ('DEVICE', key)
-
-
-# ── Watcher de pasta ──────────────────────────────────────────────────────────
-
-def watch_folder(folder: str, output_dir: Optional[str] = None):
-    """Monitora uma pasta e executa o builder quando aparecer um novo .json"""
-    path = Path(folder)
-    if not path.exists():
-        path.mkdir(parents=True)
-
-    seen = set(path.glob('*.json'))
-    _info(f"Monitorando '{folder}' — coloque arquivos .json aqui")
-    _info("Pressione Ctrl+C para parar\n")
+    dlg_id = _open_pick_devices()
 
     try:
-        while True:
-            current = set(path.glob('*.json'))
-            new_files = current - seen
-            for f in sorted(new_files):
-                _info(f"\nNovo arquivo: {f.name}")
-                out = None
-                if output_dir:
-                    out = str(Path(output_dir) / f.stem) + '.pdsprj'
-                run_build(str(f), out)
-            seen = current
-            time.sleep(1)
-    except KeyboardInterrupt:
-        _info("Monitoramento encerrado.")
+        # Desabilita filtros restritivos
+        call("ui_act", {"window": dlg_id, "name": "wholeWordsCheck", "value": "false"})
+        call("ui_act", {"window": dlg_id, "name": "managedCheck",    "value": "false"})
 
+        # Define categoria (se != All Categories)
+        if cat_idx > 0:
+            call("ui_act", {"window": dlg_id, "name": "catList",
+                            "property": "currentRow", "value": str(cat_idx)})
+            time.sleep(0.4)
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+        # Define keyword de busca
+        call("ui_act", {"window": dlg_id, "name": "keywordsEdit", "value": search_keyword})
+        time.sleep(1.0)  # aguarda tabela atualizar
 
-def run_build(json_path: str, output_path: Optional[str] = None) -> bool:
-    if not os.path.exists(json_path):
-        _error(f"Arquivo não encontrado: {json_path}")
+        # Obtém a tabela de resultados via describe
+        r = call("ui_describe", {"id": dlg_id, "depth": "full"})
+        res_ctrl = _find_control_in_tree(r.get("data", {}), "resList")
+
+        if res_ctrl is None:
+            raise RuntimeError(f"Controle 'resList' não encontrado no dialog {dlg_id}")
+
+        iv = res_ctrl.get("item_view", {})
+        rows = iv.get("rows", 0)
+        if rows == 0:
+            raise RuntimeError(
+                f"Nenhum resultado para '{search_keyword}'. "
+                f"Verifique PART_SEARCH_CONFIG para '{part_name}'."
+            )
+
+        # Encontra a linha com device name == part_name (DEVICE library)
+        target_row = 0
+        for i, item in enumerate(iv.get("items", [])):
+            cells = item.get("cells", [])
+            if cells and cells[0] == part_name:
+                target_row = i
+                break
+
+        print(f"    {rows} resultado(s) — selecionando linha {target_row}: "
+              f"{iv.get('items', [{}])[target_row:target_row+1]}")
+
+        call("ui_act", {"id": res_ctrl["id"], "property": "currentRow",
+                        "value": str(target_row)})
+        time.sleep(0.3)
+
+        # Confirma
+        call("ui_answer_dialog", {"id": dlg_id, "answer": "Ok"})
+        time.sleep(0.5)
+
+        # Verifica
+        if part_name in list_parts_bin(design_id):
+            print(f"  ✓ '{part_name}' adicionado com sucesso")
+            return True
+
+        print(f"  ✗ '{part_name}' não apareceu no parts bin após OK")
         return False
 
-    with open(json_path, 'r', encoding='utf-8') as f:
+    except Exception as e:
+        print(f"  ✗ Erro ao adicionar '{part_name}': {e}")
         try:
-            circuit = json.load(f)
-        except json.JSONDecodeError as e:
-            _error(f"JSON inválido: {e}")
-            return False
+            call("ui_answer_dialog", {"id": dlg_id, "answer": "Cancel"})
+        except Exception:
+            pass
+        return False
 
-    _info(f"Circuito    : {circuit.get('name', 'Sem nome')}")
-    _info(f"Descrição   : {circuit.get('description', '')}")
-    _info(f"Componentes : {len(circuit.get('components', []))}")
-    _info(f"Fios        : {len(circuit.get('wires', []))}")
-    print()
 
-    builder = ProteusComBuilder()
-    return builder.build(circuit, output_path)
+# ---------------------------------------------------------------------------
+# Posicionamento de componentes
+# ---------------------------------------------------------------------------
 
+def place_components(design_id, sheet_id, components):
+    """
+    Posiciona todos os componentes em grade automática (4 colunas).
+    Retorna dict ref -> {x, y}.
+    """
+    COL_W = 1100   # thou entre colunas
+    ROW_H = 1100   # thou entre linhas
+    COLS  = 4
+    X0    = 1500   # origem X
+    Y0    = 9000   # origem Y (Proteus: Y cresce para cima)
+
+    placed = {}
+    for i, comp in enumerate(components):
+        col = i % COLS
+        row = i // COLS
+        x = X0 + col * COL_W
+        y = Y0 - row * ROW_H
+
+        ref   = comp["ref"]
+        part  = comp["part"]
+        value = comp.get("value", "")
+
+        r = call("schematic_place_device", {
+            "id":        design_id,
+            "sheet":     sheet_id,
+            "name":      part,
+            "reference": ref,
+            "value":     value,
+            "x":         x,
+            "y":         y,
+        })
+        placed[ref] = {"x": x, "y": y}
+
+        data     = r.get("data", {})
+        overlaps = data.get("overlaps", [])
+        if overlaps:
+            print(f"  ⚠  {ref} sobrepõe: {[o['ref'] for o in overlaps]}")
+        else:
+            print(f"  ✓  {ref} ({part}={value}) → ({x}, {y})")
+
+    return placed
+
+
+# ---------------------------------------------------------------------------
+# Terminais de alimentação
+# ---------------------------------------------------------------------------
+
+def place_power_terminals(design_id, sheet_id, power_nets, components, wires):
+    """
+    Coloca terminais POWER/GROUND para cada pino de alimentação no circuito.
+    Cada pino que participa de uma rede nomeada VCC ou GND recebe um terminal.
+    """
+    if not power_nets:
+        return
+
+    # Coleta pinos por rede
+    net_pins = {}
+    for wire in wires:
+        net = wire.get("net")
+        if not net or net not in power_nets:
+            continue
+        for endpoint in (wire["from"], wire["to"]):
+            ref, pin = endpoint["ref"], endpoint["pin"]
+            net_pins.setdefault(net, set()).add((ref, pin))
+
+    # Posiciona terminais próximos a cada pino
+    comp_positions = {}  # rough positions — reais disponíveis após place_components
+
+    term_type = {"VCC": "POWER", "GND": "GROUND"}
+
+    # Um terminal por rede, posição fixa
+    TERM_X = {"VCC": 500, "GND": 500}
+    TERM_Y = {"VCC": 9700, "GND": 7000}
+
+    for net_name, voltage in power_nets.items():
+        ttype = "POWER" if voltage != 0 else "GROUND"
+        label = net_name
+        tx = TERM_X.get(net_name, 500)
+        ty = TERM_Y.get(net_name, 8000)
+
+        try:
+            call("schematic_place_terminal", {
+                "id":       design_id,
+                "sheet":    sheet_id,
+                "terminal": ttype,
+                "label":    label,
+                "x":        tx,
+                "y":        ty,
+            })
+            print(f"  ✓  Terminal {ttype}:{label} → ({tx}, {ty})")
+        except Exception as e:
+            print(f"  ⚠  Terminal {label}: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Roteamento
+# ---------------------------------------------------------------------------
+
+def build_route_nets(wires, power_nets=None):
+    """
+    Converte wires do JSON em estrutura para schematic_route_nets.
+    Agrupa por net name; wires sem net formam redes anônimas individuais.
+    """
+    net_map = {}  # net_name -> set of (ref, pin)
+    anon_id = [0]
+
+    def add_pin(net, ref, pin):
+        net_map.setdefault(net, set()).add((ref, pin))
+
+    for wire in wires:
+        net = wire.get("net") or f"_anon_{anon_id[0]}"
+        if not wire.get("net"):
+            anon_id[0] += 1
+        frm, to = wire["from"], wire["to"]
+        add_pin(net, frm["ref"], frm["pin"])
+        add_pin(net, to["ref"],  to["pin"])
+
+    nets_out = []
+    for name, pins in net_map.items():
+        entry = {
+            "name": name,
+            "pins": [{"ref": r, "name": p} for r, p in pins],
+        }
+        # Adiciona terminais para redes de alimentação
+        if power_nets and name in power_nets:
+            ttype = "POWER" if power_nets[name] != 0 else "GROUND"
+            entry["terminals"] = [{"ref": ttype, "name": name}]
+
+        nets_out.append(entry)
+
+    return nets_out
+
+
+# ---------------------------------------------------------------------------
+# Função principal
+# ---------------------------------------------------------------------------
+
+def build_circuit(json_path):
+    print(f"\n=== Construtor de Circuitos Proteus ===")
+    print(f"Arquivo: {json_path}\n")
+
+    with open(json_path, encoding="utf-8") as f:
+        circuit = json.load(f)
+
+    print(f"Circuito: {circuit['name']}")
+    print(f"Descrição: {circuit.get('description', '')}\n")
+
+    # 1. Conecta ao Proteus
+    design_id, sheet_id = get_status()
+    print(f"Design: {design_id}  Sheet: {sheet_id}\n")
+
+    # 2. Parts bin
+    print("--- Parts bin ---")
+    needed  = {comp["part"] for comp in circuit["components"]}
+    in_bin  = list_parts_bin(design_id)
+    missing = needed - in_bin
+
+    if missing:
+        print(f"Faltando: {missing}")
+        for part in sorted(missing):
+            add_to_parts_bin(part, design_id)
+    else:
+        print("Todas as partes já estão no parts bin ✓")
+
+    in_bin = list_parts_bin(design_id)
+    still_missing = needed - in_bin
+    if still_missing:
+        print(f"\n✗ Partes ainda faltando: {still_missing}")
+        print("  Adicione manualmente: Library → Pick Device")
+        return False
+
+    # 3. Transação de desenho
+    print("\n--- Desenhando ---")
+    call("schematic_begin_transaction", {"id": design_id})
+    print("Transação iniciada\n")
+
+    try:
+        # 4. Componentes
+        print("Posicionando componentes:")
+        place_components(design_id, sheet_id, circuit["components"])
+
+        # 5. Terminais de alimentação (ANTES do roteamento)
+        print("\nTerminais de alimentação:")
+        place_power_terminals(
+            design_id, sheet_id,
+            circuit.get("power_nets", {}),
+            circuit["components"],
+            circuit["wires"],
+        )
+
+        # 6. Roteia
+        print("\nRoteando redes:")
+        nets = build_route_nets(circuit["wires"], circuit.get("power_nets", {}))
+        r = call("schematic_route_nets", {
+            "id":          design_id,
+            "sheet":       sheet_id,
+            "max_corners": 2,
+            "nets":        nets,
+        })
+        summary = r.get("data", {}).get("summary", {})
+        print(f"  OK: {summary.get('routed',0)}  "
+              f"Parcial: {summary.get('partial',0)}  "
+              f"Falhou: {summary.get('failed',0)}")
+
+        # 7. Commit
+        r = call("schematic_end_transaction", {
+            "id":        design_id,
+            "auto_nudge": True,
+        })
+        fouls = r.get("data", {}).get("block_placement", {}).get("fouls", [])
+        if fouls:
+            print(f"  ⚠  Sobreposições: {[f['ref'] for f in fouls]}")
+        print("Transação finalizada ✓")
+
+        # 8. Salva
+        call("file_save", {})
+        print(f"\n✓ Circuito '{circuit['name']}' criado com sucesso!")
+        return True
+
+    except Exception as e:
+        print(f"\n✗ Erro: {e}")
+        print("Revertendo transação...")
+        try:
+            call("schematic_end_transaction", {"id": design_id, "abandon": True})
+        except Exception:
+            pass
+        return False
+
+
+# ---------------------------------------------------------------------------
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Proteus Circuit Builder — converte JSON em esquemático Proteus'
+        description="Cria circuitos Proteus automaticamente a partir de JSON"
     )
-    parser.add_argument('input', help='Arquivo .json do circuito OU pasta (com --watch)')
-    parser.add_argument('output', nargs='?', help='Arquivo .pdsprj de saída (opcional)')
-    parser.add_argument('--watch', action='store_true',
-                        help='Monitorar pasta continuamente')
+    parser.add_argument("json_file", help="Arquivo JSON do circuito")
     args = parser.parse_args()
-
-    if args.watch:
-        watch_folder(args.input, args.output)
-    else:
-        ok = run_build(args.input, args.output)
-        sys.exit(0 if ok else 1)
+    success = build_circuit(args.json_file)
+    sys.exit(0 if success else 1)
 
 
-# ── Helpers de log ────────────────────────────────────────────────────────────
-
-def _info(msg):  print(f"[OK] {msg}")
-def _warn(msg):  print(f"[!!] {msg}")
-def _error(msg): print(f"[XX] {msg}")
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
