@@ -42,10 +42,24 @@ PART_SEARCH_CONFIG = {
     "SW-SPST":   ("Single pole single throw",  0),
     "POT-HG":        ("Variable resistor",         0),
     "INDUCTOR":      ("Generic inductor",          0),
+    "ARDUINO-NANO":  ("ARDUINO NANO",               0),
     "ARDUINO-UNO":   ("ARDUINO UNO",               0),
     "ARDUINO-MINI":  ("ARDUINO MINI",              0),
     "ARDUINO-MEGA":  ("ARDUINO MEGA 2560",         0),
 }
+
+# Mapa do nome interno (JSON) → nome real no Proteus (parts bin + place_device)
+# Necessário quando o nome interno usa hífen mas o Proteus usa espaço
+PART_PROTEUS_NAME = {
+    "ARDUINO-NANO": "ARDUINO NANO",
+    "ARDUINO-UNO":  "ARDUINO UNO",
+    "ARDUINO-MINI": "ARDUINO MINI",
+    "ARDUINO-MEGA": "ARDUINO MEGA 2560",
+}
+
+def proteus_name(part: str) -> str:
+    """Converte nome interno (ARDUINO-UNO) para nome real no Proteus (ARDUINO UNO)."""
+    return PART_PROTEUS_NAME.get(part, part)
 
 # ---------------------------------------------------------------------------
 # Geometria dos símbolos Proteus (thou)
@@ -135,7 +149,7 @@ def _find_in_tree(node, obj_name):
 
 
 def add_to_parts_bin(part_name, design_id):
-    if part_name in list_parts_bin(design_id):
+    if proteus_name(part_name) in list_parts_bin(design_id):
         print(f"  ✓ {part_name} já no parts bin")
         return True
 
@@ -178,7 +192,7 @@ def add_to_parts_bin(part_name, design_id):
         call("ui_answer_dialog", {"id": dlg_id, "answer": "Ok"})
         time.sleep(0.5)
 
-        if part_name in list_parts_bin(design_id):
+        if proteus_name(part_name) in list_parts_bin(design_id):
             print(f"  ✓ '{part_name}' adicionado")
             return True
         print(f"  ✗ '{part_name}' não apareceu no parts bin")
@@ -293,7 +307,7 @@ def place_components(design_id, sheet_id, components, positions):
         x, y = positions[ref]
         r = call("schematic_place_device", {
             "id": design_id, "sheet": sheet_id,
-            "name": part, "reference": ref, "value": val,
+            "name": proteus_name(part), "reference": ref, "value": val,
             "x": int(x), "y": int(y),
         })
         overlaps = r.get("data", {}).get("overlaps", [])
@@ -510,7 +524,7 @@ def build_circuit(json_path):
     else:
         print("Todas as partes já estão no parts bin ✓")
 
-    still_missing = needed - list_parts_bin(design_id)
+    still_missing = {p for p in needed if proteus_name(p) not in list_parts_bin(design_id)}
     if still_missing:
         print(f"\n✗ Ainda faltam: {still_missing}  — abortando")
         return False
