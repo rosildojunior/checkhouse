@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: checkhouse
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: CNJ_API_KEY
+        sync: false
+      - key: PORT
+        value: 10000
