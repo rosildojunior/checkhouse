@@ -623,6 +623,51 @@
   .analise-home-card.nivel-alto{border-left-color:#E65100;}
   .analise-home-card.nivel-critico{border-left-color:var(--danger);}
 
+  .consulta-auto-box{
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:18px;
+  }
+  .consulta-auto-box .cab-title{font-weight:700;font-size:14px;color:var(--accent);margin-bottom:4px;}
+  .consulta-auto-box .cab-sub{font-size:12.5px;color:var(--ink-soft);}
+  .consulta-status{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 14px;border-radius:8px;
+    font-size:13px;font-weight:600;margin-bottom:12px;
+  }
+  .consulta-status.loading{background:#EFF6FF;color:#1D4ED8;}
+  .consulta-status.ok{background:var(--ok-soft);color:var(--ok);}
+  .consulta-status.erro{background:var(--danger-soft);color:var(--danger);}
+  .spinner{
+    width:16px;height:16px;border:2.5px solid currentColor;
+    border-top-color:transparent;border-radius:50%;
+    animation:spin .7s linear infinite;flex-shrink:0;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .portais-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  .portal-link{
+    display:flex;align-items:center;gap:8px;
+    background:var(--paper-card);border:1px solid var(--line);
+    border-radius:8px;padding:11px 12px;
+    font-size:13px;font-weight:600;color:var(--ink);
+    text-decoration:none;cursor:pointer;
+  }
+  .portal-link:active{opacity:.8;}
+
+  .processos-encontrados{
+    background:var(--danger-soft);
+    border:1px solid var(--danger);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:13.5px;
+    color:var(--danger);
+    margin-bottom:12px;
+  }
+  .processos-encontrados strong{display:block;font-size:15px;margin-bottom:4px;}
+
   @media print{
     .analise-actions, .sticky-footer, header.topbar{display:none !important;}
     .ficha-print{border:none;padding:10px 0;}
@@ -825,6 +870,15 @@
       <div class="hint">Só vale para as próximas fotos tiradas — as já salvas não mudam.</div>
     </div>
 
+    <div class="section-label" style="margin-top:30px;">Servidor de consulta (CNJ DataJud)</div>
+    <div class="field">
+      <label>URL do servidor local</label>
+      <input type="text" id="cfgServidor" placeholder="http://localhost:3001">
+      <div class="hint">Deixe em branco para desativar a consulta automática. Inicie com: <code>cd server && npm install && npm start</code></div>
+    </div>
+    <button class="btn btn-ghost btn-block" onclick="testarServidor()">Testar conexão</button>
+    <div class="link-banner" id="servidorTesteResult" style="margin-top:8px;"></div>
+
     <div class="section-label">Espaço utilizado</div>
     <div class="espaco-box" id="espacoInfo">Calculando...</div>
   </section>
@@ -969,6 +1023,18 @@
   <!-- ================= ANÁLISE DE CLIENTE (FORM) ================= -->
   <section class="screen" id="screen-analise-form">
 
+    <!-- Painel de consulta automática -->
+    <div class="consulta-auto-box" id="consultaAutoBox">
+      <div class="cab-title">Consulta automática — CNJ DataJud</div>
+      <div class="cab-sub" id="consultaAutoSub">Digite o CPF e toque em "Consultar" para buscar processos em todos os tribunais brasileiros.</div>
+      <div id="consultaStatusWrap" style="margin-top:10px;display:none;"></div>
+      <div id="processosResultado" style="display:none;"></div>
+      <button class="btn btn-ghost" id="btnConsultarAuto" style="margin-top:10px;width:100%;justify-content:center;display:flex;" onclick="consultarAutomatico()">🔍 Consultar processos (CNJ)</button>
+      <div style="margin-top:10px;font-size:12px;color:var(--ink-soft);">
+        Requer servidor local rodando. <a id="linkConfigServidor" style="color:var(--accent);cursor:pointer;font-weight:600;" onclick="abrirConfiguracoes()">Configurar servidor →</a>
+      </div>
+    </div>
+
     <div class="section-label">Identificação do cliente</div>
 
     <div class="row2">
@@ -1080,7 +1146,17 @@
       </select>
     </div>
 
-    <div class="section-label">Observações</div>
+    <div class="section-label">Consultas externas — abrir portais</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;">Toque para abrir o portal com o CPF pré-preenchido na URL.</div>
+    <div class="portais-grid" id="portaisGrid">
+      <a class="portal-link" id="linkSerasa" target="_blank" rel="noopener">💳 Serasa Consumidor</a>
+      <a class="portal-link" id="linkSpc" target="_blank" rel="noopener">📋 SPC Brasil</a>
+      <a class="portal-link" id="linkJusbrasil" target="_blank" rel="noopener">⚖️ Jusbrasil</a>
+      <a class="portal-link" id="linkPF" target="_blank" rel="noopener">🔎 Antecedentes PF</a>
+    </div>
+    <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">Serasa e SPC exigem login do próprio titular do CPF ou contratos de bureau. Jusbrasil e PF são públicos.</div>
+
+    <div class="section-label" style="margin-top:20px;">Observações</div>
     <div class="field">
       <label>Notas adicionais <span style="font-weight:400;color:var(--ink-soft);">(opcional)</span></label>
       <textarea id="anlObs" rows="3" placeholder="Informações complementares sobre o cliente..."></textarea>
@@ -3016,6 +3092,144 @@ function renderListaAnalises(){
     });
     wrap.appendChild(card);
   });
+}
+
+/* ===================== SERVIDOR / CONSULTA AUTOMÁTICA ===================== */
+
+function getServidorUrl(){
+  return (localStorage.getItem('servidorUrl') || '').trim().replace(/\/$/, '');
+}
+function saveServidorUrl(url){
+  localStorage.setItem('servidorUrl', url);
+}
+
+async function testarServidor(){
+  const url   = document.getElementById('cfgServidor').value.trim().replace(/\/$/, '');
+  const el    = document.getElementById('servidorTesteResult');
+  el.className = 'link-banner show';
+  el.textContent = 'Testando...';
+  if(!url){ el.textContent = 'Digite a URL do servidor.'; return; }
+  try {
+    const r = await fetch(url + '/api/status', { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    if(d.ok){
+      el.textContent = `✓ Conectado! CNJ: ${d.cnj_configurado ? 'chave OK' : '⚠️ chave não configurada'} · ${d.tribunais} tribunais`;
+      saveServidorUrl(url);
+    } else {
+      el.className = 'link-banner error show';
+      el.textContent = 'Servidor respondeu mas retornou erro.';
+    }
+  } catch(e) {
+    el.className = 'link-banner error show';
+    el.textContent = 'Não foi possível conectar: ' + e.message;
+  }
+}
+
+function atualizarLinksPortais(){
+  const cpf = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
+  const cpfFmt = cpf.length === 11
+    ? `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`
+    : '';
+
+  const serasa   = document.getElementById('linkSerasa');
+  const spc      = document.getElementById('linkSpc');
+  const jusbr    = document.getElementById('linkJusbrasil');
+  const pf       = document.getElementById('linkPF');
+
+  if(serasa)  serasa.href  = 'https://www.serasaconsumidor.com.br/';
+  if(spc)     spc.href     = 'https://www.spcbrasil.org.br/pesquisa';
+  if(jusbr)   jusbr.href   = cpfFmt
+    ? `https://www.jusbrasil.com.br/consulta-processual/?cpf=${cpf}`
+    : 'https://www.jusbrasil.com.br/consulta-processual/';
+  if(pf)      pf.href      = 'https://www.pf.gov.br/servicos-pf/antecedentes-criminais';
+}
+
+// Atualiza links ao digitar o CPF
+document.addEventListener('DOMContentLoaded', () => {
+  const cpfInput = document.getElementById('anlCpf');
+  if(cpfInput) cpfInput.addEventListener('input', atualizarLinksPortais);
+});
+
+async function consultarAutomatico(){
+  const cpf    = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
+  const btnEl  = document.getElementById('btnConsultarAuto');
+  const stWrap = document.getElementById('consultaStatusWrap');
+  const resWrap= document.getElementById('processosResultado');
+
+  if(!validarCpf(cpf)){
+    alert('Digite um CPF válido antes de consultar.');
+    return;
+  }
+
+  const servidor = getServidorUrl();
+  if(!servidor){
+    alert('Configure a URL do servidor em Configurações primeiro.\n\nPara iniciar o servidor:\n  cd server\n  npm install\n  npm start');
+    return;
+  }
+
+  stWrap.style.display  = '';
+  resWrap.style.display = 'none';
+  btnEl.disabled        = true;
+
+  stWrap.innerHTML = `<div class="consulta-status loading"><div class="spinner"></div> Consultando ${document.querySelector('#consultaAutoSub') ? '' : ''}processos nos tribunais brasileiros...</div>`;
+
+  try {
+    const resp = await fetch(`${servidor}/api/consultar-cpf/${cpf}`, {
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if(!resp.ok){
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.erro || `Erro HTTP ${resp.status}`);
+    }
+
+    const dados = await resp.json();
+    stWrap.innerHTML = `<div class="consulta-status ok">✓ Consulta concluída — ${dados.tribunaisConsultados} tribunais verificados</div>`;
+
+    if(dados.totalProcessos > 0){
+      // Pré-preenche o campo de processos
+      document.getElementById('anlProcessos').value = 'sim';
+      document.getElementById('anlProcessosQtd').value = dados.totalProcessos;
+      document.getElementById('anlProcessosQtdWrap').style.display = '';
+
+      const detalhes = dados.processos.slice(0, 5).map(p =>
+        `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid rgba(163,61,47,.15);">
+          <strong>${p.tribunal}</strong> · ${p.numero}<br>
+          <span style="color:var(--ink-soft);">${p.classe} — ${p.assunto}</span>
+        </div>`
+      ).join('');
+
+      resWrap.style.display = '';
+      resWrap.innerHTML = `
+        <div class="processos-encontrados">
+          <strong>${dados.totalProcessos} processo(s) encontrado(s)</strong>
+          ${detalhes}
+          ${dados.totalProcessos > 5 ? `<div style="font-size:12px;margin-top:4px;">... e mais ${dados.totalProcessos - 5} processo(s)</div>` : ''}
+        </div>`;
+    } else {
+      document.getElementById('anlProcessos').value = 'nao';
+      document.getElementById('anlProcessosQtdWrap').style.display = 'none';
+      resWrap.style.display = '';
+      resWrap.innerHTML = `<div style="color:var(--ok);font-weight:600;font-size:13.5px;margin-top:6px;">✓ Nenhum processo encontrado nos ${dados.tribunaisConsultados} tribunais consultados</div>`;
+    }
+  } catch(e){
+    stWrap.innerHTML = `<div class="consulta-status erro">✗ ${e.message}</div>`;
+    if(e.message.includes('chave') || e.message.includes('CNJ')){
+      stWrap.innerHTML += `<div style="font-size:12px;margin-top:6px;color:var(--ink-soft);">Cadastre-se gratuitamente em <a href="https://datajud-wiki.cnj.jus.br/api-publica/acesso" target="_blank" style="color:var(--accent);">datajud-wiki.cnj.jus.br</a> e configure a chave no arquivo <code>server/.env</code>.</div>`;
+    }
+  } finally {
+    btnEl.disabled = false;
+  }
+}
+
+// Preenche campo do servidor ao abrir configurações
+const _origAbrirConfig = abrirConfiguracoes;
+function abrirConfiguracoes(){
+  _origAbrirConfig();
+  const el = document.getElementById('cfgServidor');
+  if(el) el.value = getServidorUrl();
+  const res = document.getElementById('servidorTesteResult');
+  if(res) res.className = 'link-banner';
 }
 
 // Estilo das tabs da home
