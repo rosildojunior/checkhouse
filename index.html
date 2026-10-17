@@ -463,6 +463,170 @@
     .cpage:last-child{page-break-after:auto;}
     @page{ size:A4; margin:0; }
   }
+
+  /* =============== ANÁLISE DE CLIENTES =============== */
+  .risk-gauge{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin:20px 0;
+  }
+  .risk-arc{
+    width:180px;height:90px;
+    position:relative;
+    overflow:hidden;
+  }
+  .risk-arc svg{width:180px;height:90px;}
+  .risk-score-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:36px;
+    font-weight:700;
+    line-height:1;
+    margin-top:4px;
+  }
+  .risk-label{
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-top:2px;
+  }
+
+  .decisao-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 20px;
+    border-radius:var(--radius);
+    font-size:17px;
+    font-weight:700;
+    width:100%;
+    justify-content:center;
+    margin:16px 0;
+  }
+  .decisao-aprovado{background:var(--ok-soft);color:var(--ok);border:2px solid var(--ok);}
+  .decisao-ressalva{background:var(--warn-soft);color:var(--warn);border:2px solid var(--warn);}
+  .decisao-adicional{background:#FFF3E0;color:#E65100;border:2px solid #E65100;}
+  .decisao-reprovado{background:var(--danger-soft);color:var(--danger);border:2px solid var(--danger);}
+
+  .risk-factor-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-radius:8px;
+    margin-bottom:6px;
+    font-size:14px;
+    background:var(--paper-card);
+    border:1px solid var(--line);
+  }
+  .risk-factor-row .rf-label{font-weight:600;}
+  .risk-factor-row .rf-val{font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .rf-ok{border-left:4px solid var(--ok);}
+  .rf-warn{border-left:4px solid var(--warn);}
+  .rf-danger{border-left:4px solid var(--danger);}
+
+  .ficha-print{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 18px;
+  }
+  .ficha-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:12px;
+    margin-bottom:16px;
+  }
+  .ficha-header .fh-title{font-size:16px;font-weight:700;color:var(--accent);}
+  .ficha-header .fh-date{font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+  .ficha-info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 14px;
+    margin-bottom:14px;
+  }
+  .fi-item .fi-lbl{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+  .fi-item .fi-val{font-size:14px;font-weight:600;margin-top:1px;}
+
+  .analise-card-list{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .analise-card-list-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    font-size:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .analise-card-list-item:last-child{border-bottom:none;}
+  .analise-card-list-item .aci-icon{font-size:18px;flex-shrink:0;}
+  .analise-card-list-item .aci-text{flex:1;}
+  .aci-ok{background:#FAFFF9;}
+  .aci-warn{background:#FFFDF0;}
+  .aci-danger{background:#FFF8F7;}
+
+  .assinatura-block{
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px dashed var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+  }
+  .assinatura-campo{
+    flex:1;
+    text-align:center;
+  }
+  .assinatura-linha{
+    border-top:1px solid var(--ink);
+    margin-bottom:5px;
+    padding-top:6px;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
+  .score-bar{
+    height:10px;
+    border-radius:5px;
+    background:#E5E7EB;
+    overflow:hidden;
+    margin:6px 0 2px;
+  }
+  .score-bar-fill{
+    height:100%;
+    border-radius:5px;
+    transition:width .3s;
+  }
+
+  .analise-list-home{
+    margin-top:8px;
+  }
+  .analise-home-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    border-radius:var(--radius);
+    padding:12px 16px;
+    margin-bottom:8px;
+    cursor:pointer;
+  }
+  .analise-home-card.nivel-baixo{border-left-color:var(--ok);}
+  .analise-home-card.nivel-medio{border-left-color:var(--warn);}
+  .analise-home-card.nivel-alto{border-left-color:#E65100;}
+  .analise-home-card.nivel-critico{border-left-color:var(--danger);}
+
+  @media print{
+    .analise-actions, .sticky-footer, header.topbar{display:none !important;}
+    .ficha-print{border:none;padding:10px 0;}
+  }
 </style>
 </head>
 <body>
@@ -589,10 +753,16 @@
     </div>
     <div class="home-actions" style="flex-wrap:wrap;gap:10px;">
       <button class="btn btn-primary" style="flex:1;" onclick="goNovaVistoria()">+ Nova vistoria</button>
+      <button class="btn btn-ghost" onclick="goAnaliseCliente()" style="display:flex;align-items:center;gap:6px;">👤 Análise</button>
       <button class="btn btn-ghost" id="btnInstalarPWA" style="display:none;align-items:center;gap:6px;" onclick="instalarPWA()">📲 Instalar app</button>
     </div>
 
+    <div id="homeTabsBar" style="display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:14px;">
+      <button id="homeTabVist" class="home-tab active" onclick="homeTab('vistorias')">Vistorias</button>
+      <button id="homeTabAnal" class="home-tab" onclick="homeTab('analises')">Análises</button>
+    </div>
     <div id="listaVistorias"></div>
+    <div id="listaAnalises" style="display:none;"></div>
   </section>
 
   <!-- ================= CONFIGURAÇÕES ================= -->
@@ -796,6 +966,143 @@
     </div>
   </section>
 
+  <!-- ================= ANÁLISE DE CLIENTE (FORM) ================= -->
+  <section class="screen" id="screen-analise-form">
+
+    <div class="section-label">Identificação do cliente</div>
+
+    <div class="row2">
+      <div class="field">
+        <label>CPF</label>
+        <input type="text" id="anlCpf" placeholder="000.000.000-00" maxlength="14" oninput="formatarCpfInput(this)" onblur="validarCpfCampo()">
+        <div class="field-error" id="anlCpfErro"></div>
+      </div>
+      <div class="field">
+        <label>Data de nascimento</label>
+        <input type="date" id="anlNasc">
+      </div>
+    </div>
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="anlNome">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>E-mail <span style="font-weight:400;color:var(--ink-soft);">(opcional)</span></label>
+        <input type="text" id="anlEmail" placeholder="cliente@email.com">
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" id="anlTelefone" placeholder="(00) 00000-0000" maxlength="16" oninput="this.value=formatarTelefoneInput(this.value)">
+      </div>
+    </div>
+
+    <div class="section-label">Dados financeiros</div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Renda mensal bruta (R$)</label>
+        <input type="text" inputmode="numeric" id="anlRenda" placeholder="R$ 0,00" oninput="this.value=formatarMoedaInput(this.value)">
+        <div class="hint">Informe 0 se não foi comprovada.</div>
+      </div>
+      <div class="field">
+        <label>Aluguel pretendido (R$)</label>
+        <input type="text" inputmode="numeric" id="anlAluguel" placeholder="R$ 0,00" oninput="this.value=formatarMoedaInput(this.value)">
+      </div>
+    </div>
+
+    <div class="section-label">Restrições e consultas</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;">Preencha com base nas consultas realizadas nos serviços de proteção ao crédito e órgãos competentes.</div>
+
+    <!-- SPC -->
+    <div class="field">
+      <label>Restrição no SPC</label>
+      <select id="anlSpc">
+        <option value="nao">Sem restrições</option>
+        <option value="sim">Possui restrições</option>
+        <option value="nao_consultado">Não consultado</option>
+      </select>
+    </div>
+    <div class="field" id="anlSpcValorWrap" style="display:none;">
+      <label>Valor total das dívidas SPC (R$)</label>
+      <input type="text" inputmode="numeric" id="anlSpcValor" placeholder="R$ 0,00" oninput="this.value=formatarMoedaInput(this.value)">
+    </div>
+
+    <!-- Serasa -->
+    <div class="field">
+      <label>Restrição no Serasa</label>
+      <select id="anlSerasa">
+        <option value="nao">Sem restrições</option>
+        <option value="sim">Possui restrições</option>
+        <option value="nao_consultado">Não consultado</option>
+      </select>
+    </div>
+    <div class="field" id="anlSerasaValorWrap" style="display:none;">
+      <label>Valor total das dívidas Serasa (R$)</label>
+      <input type="text" inputmode="numeric" id="anlSerasaValor" placeholder="R$ 0,00" oninput="this.value=formatarMoedaInput(this.value)">
+    </div>
+
+    <!-- Protestos -->
+    <div class="field">
+      <label>Protestos em cartório</label>
+      <select id="anlProtestos">
+        <option value="nao">Sem protestos</option>
+        <option value="sim">Possui protestos</option>
+        <option value="nao_consultado">Não consultado</option>
+      </select>
+    </div>
+    <div class="field" id="anlProtestosValorWrap" style="display:none;">
+      <label>Valor total dos protestos (R$)</label>
+      <input type="text" inputmode="numeric" id="anlProtestosValor" placeholder="R$ 0,00" oninput="this.value=formatarMoedaInput(this.value)">
+    </div>
+
+    <!-- Processos -->
+    <div class="field">
+      <label>Processos judiciais</label>
+      <select id="anlProcessos">
+        <option value="nao">Sem processos</option>
+        <option value="sim">Possui processos</option>
+        <option value="nao_consultado">Não consultado</option>
+      </select>
+    </div>
+    <div class="field" id="anlProcessosQtdWrap" style="display:none;">
+      <label>Quantidade de processos</label>
+      <input type="number" id="anlProcessosQtd" min="1" placeholder="1">
+    </div>
+
+    <!-- Antecedentes criminais -->
+    <div class="field">
+      <label>Antecedentes criminais</label>
+      <select id="anlCrimes">
+        <option value="nao">Sem antecedentes</option>
+        <option value="sim">Possui antecedentes</option>
+        <option value="nao_consultado">Não consultado</option>
+      </select>
+    </div>
+
+    <div class="section-label">Observações</div>
+    <div class="field">
+      <label>Notas adicionais <span style="font-weight:400;color:var(--ink-soft);">(opcional)</span></label>
+      <textarea id="anlObs" rows="3" placeholder="Informações complementares sobre o cliente..."></textarea>
+    </div>
+
+    <div class="field-error" id="anlFormErro"></div>
+
+  </section>
+
+  <!-- ================= ANÁLISE DE CLIENTE (RESULTADO) ================= -->
+  <section class="screen" id="screen-analise-resultado">
+
+    <div class="analise-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn btn-ghost" onclick="showScreen('screen-analise-form');document.getElementById('navBtn').style.display='flex';document.getElementById('footerAnalise').style.display='flex';">← Editar dados</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨️ Imprimir ficha</button>
+      <button class="btn btn-danger-outline" onclick="confirmarExcluirAnalise()">Excluir</button>
+    </div>
+
+    <div id="analiseResultadoConteudo"></div>
+
+  </section>
+
   <!-- ================= RELATÓRIO (ETAPA 3) ================= -->
   <section class="screen" id="screen-relatorio">
     <div class="rel-actionbar">
@@ -818,6 +1125,11 @@
 <div class="sticky-footer" id="footerForm" style="display:none;">
   <button class="btn btn-ghost" onclick="goHome()">Cancelar</button>
   <button class="btn btn-primary" onclick="salvarVistoria()">Salvar e continuar →</button>
+</div>
+
+<div class="sticky-footer" id="footerAnalise" style="display:none;">
+  <button class="btn btn-ghost" onclick="goHome()">Cancelar</button>
+  <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="gerarAnalise()">Gerar ficha de análise →</button>
 </div>
 
 <script>
@@ -2262,6 +2574,456 @@ document.getElementById('inputImportWord').addEventListener('change', e=>{
   if(f) importarWordEditado(f);
   e.target.value = '';
 });
+
+/* ===================== HOME TABS ===================== */
+
+function homeTab(tab){
+  const isVist = tab === 'vistorias';
+  document.getElementById('listaVistorias').style.display = isVist ? '' : 'none';
+  document.getElementById('listaAnalises').style.display = isVist ? 'none' : '';
+  document.getElementById('homeTabVist').classList.toggle('active', isVist);
+  document.getElementById('homeTabAnal').classList.toggle('active', !isVist);
+  if(!isVist) renderListaAnalises();
+}
+
+/* ===================== ANÁLISE DE CLIENTES ===================== */
+
+function getAnalises(){
+  return JSON.parse(localStorage.getItem('analises') || '[]');
+}
+function saveAnalises(list){
+  localStorage.setItem('analises', JSON.stringify(list));
+}
+
+let currentAnaliseId = null;
+
+function formatarCpfInput(el){
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if(v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+  else if(v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+  else if(v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+  el.value = v;
+}
+
+function validarCpf(cpf){
+  const digits = cpf.replace(/\D/g, '');
+  if(digits.length !== 11 || /^(\d)\1+$/.test(digits)) return false;
+  let sum = 0;
+  for(let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i);
+  let r = (sum * 10) % 11;
+  if(r === 10 || r === 11) r = 0;
+  if(r !== parseInt(digits[9])) return false;
+  sum = 0;
+  for(let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i);
+  r = (sum * 10) % 11;
+  if(r === 10 || r === 11) r = 0;
+  return r === parseInt(digits[10]);
+}
+
+function validarCpfCampo(){
+  const cpf = document.getElementById('anlCpf').value;
+  const erroEl = document.getElementById('anlCpfErro');
+  if(cpf && !validarCpf(cpf)){
+    erroEl.textContent = 'CPF inválido.';
+    erroEl.classList.add('show');
+  } else {
+    erroEl.classList.remove('show');
+  }
+}
+
+function parseMoeda(str){
+  if(!str) return 0;
+  return parseFloat(str.replace(/[R$\s.]/g,'').replace(',','.')) || 0;
+}
+
+function calcularScore(dados){
+  let score = 100;
+  const fatores = [];
+
+  if(!validarCpf(dados.cpf)){
+    return { score: 0, nivel: 'critico', fatores: [{ label:'CPF inválido', deducao: 100, classe:'danger' }] };
+  }
+
+  // SPC
+  if(dados.spc === 'nao_consultado'){
+    score -= 8;
+    fatores.push({ label:'SPC não consultado', deducao: 8, classe:'warn' });
+  } else if(dados.spc === 'sim'){
+    const v = dados.spcValor;
+    const d = v > 10000 ? 45 : v > 3000 ? 35 : v > 0 ? 25 : 20;
+    score -= d;
+    fatores.push({ label:`Restrição SPC${v > 0 ? ' — ' + fmtMoeda(v) : ''}`, deducao: d, classe:'danger' });
+  } else {
+    fatores.push({ label:'SPC: sem restrições', deducao: 0, classe:'ok' });
+  }
+
+  // Serasa
+  if(dados.serasa === 'nao_consultado'){
+    score -= 8;
+    fatores.push({ label:'Serasa não consultado', deducao: 8, classe:'warn' });
+  } else if(dados.serasa === 'sim'){
+    const v = dados.serasaValor;
+    const d = v > 10000 ? 40 : v > 3000 ? 30 : v > 0 ? 22 : 18;
+    score -= d;
+    fatores.push({ label:`Restrição Serasa${v > 0 ? ' — ' + fmtMoeda(v) : ''}`, deducao: d, classe:'danger' });
+  } else {
+    fatores.push({ label:'Serasa: sem restrições', deducao: 0, classe:'ok' });
+  }
+
+  // Protestos
+  if(dados.protestos === 'nao_consultado'){
+    score -= 5;
+    fatores.push({ label:'Protestos não consultados', deducao: 5, classe:'warn' });
+  } else if(dados.protestos === 'sim'){
+    const v = dados.protestosValor;
+    const d = v > 5000 ? 30 : v > 1000 ? 22 : 15;
+    score -= d;
+    fatores.push({ label:`Protestos em cartório${v > 0 ? ' — ' + fmtMoeda(v) : ''}`, deducao: d, classe:'danger' });
+  } else {
+    fatores.push({ label:'Sem protestos em cartório', deducao: 0, classe:'ok' });
+  }
+
+  // Processos
+  if(dados.processos === 'nao_consultado'){
+    score -= 5;
+    fatores.push({ label:'Processos judiciais não consultados', deducao: 5, classe:'warn' });
+  } else if(dados.processos === 'sim'){
+    const q = Math.max(1, dados.processosQtd);
+    const d = Math.min(40, q * 15);
+    score -= d;
+    fatores.push({ label:`${q} processo(s) judicial(is)`, deducao: d, classe:'danger' });
+  } else {
+    fatores.push({ label:'Sem processos judiciais', deducao: 0, classe:'ok' });
+  }
+
+  // Crimes
+  if(dados.crimes === 'nao_consultado'){
+    score -= 5;
+    fatores.push({ label:'Antecedentes criminais não consultados', deducao: 5, classe:'warn' });
+  } else if(dados.crimes === 'sim'){
+    score -= 50;
+    fatores.push({ label:'Antecedentes criminais', deducao: 50, classe:'danger' });
+  } else {
+    fatores.push({ label:'Sem antecedentes criminais', deducao: 0, classe:'ok' });
+  }
+
+  // Renda vs aluguel
+  const renda = dados.renda;
+  const aluguel = dados.aluguel;
+  if(aluguel > 0){
+    if(renda === 0){
+      score -= 15;
+      fatores.push({ label:'Renda não comprovada', deducao: 15, classe:'warn' });
+    } else {
+      const ratio = renda / aluguel;
+      if(ratio < 2){
+        score -= 35;
+        fatores.push({ label:`Renda ${fmtMoeda(renda)} — abaixo de 2x o aluguel`, deducao: 35, classe:'danger' });
+      } else if(ratio < 3){
+        score -= 18;
+        fatores.push({ label:`Renda ${fmtMoeda(renda)} — abaixo de 3x o aluguel`, deducao: 18, classe:'warn' });
+      } else {
+        fatores.push({ label:`Renda ${fmtMoeda(renda)} — acima de 3x o aluguel`, deducao: 0, classe:'ok' });
+      }
+    }
+  } else if(renda > 0) {
+    fatores.push({ label:`Renda informada: ${fmtMoeda(renda)} (aluguel não informado)`, deducao: 0, classe:'ok' });
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
+  let nivel;
+  if(score >= 80) nivel = 'baixo';
+  else if(score >= 60) nivel = 'medio';
+  else if(score >= 40) nivel = 'alto';
+  else nivel = 'critico';
+
+  return { score, nivel, fatores };
+}
+
+function fmtMoeda(v){
+  return (v || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+
+function nivelInfo(nivel){
+  const map = {
+    baixo:   { label:'Risco Baixo',    cor:'var(--ok)',     badge:'decisao-aprovado',   decisao:'APROVADO',                    icone:'✅' },
+    medio:   { label:'Risco Médio',    cor:'var(--warn)',   badge:'decisao-ressalva',   decisao:'APROVADO COM RESSALVAS',      icone:'⚠️' },
+    alto:    { label:'Risco Alto',     cor:'#E65100',       badge:'decisao-adicional',  decisao:'ANÁLISE ADICIONAL NECESSÁRIA',icone:'🔶' },
+    critico: { label:'Risco Crítico',  cor:'var(--danger)', badge:'decisao-reprovado',  decisao:'REPROVADO',                   icone:'❌' },
+  };
+  return map[nivel] || map.critico;
+}
+
+function goAnaliseCliente(id){
+  currentAnaliseId = id || null;
+  const analise = id ? getAnalises().find(a => a.id === id) : null;
+
+  // preenche o formulário
+  document.getElementById('anlCpf').value = analise ? analise.cpf : '';
+  document.getElementById('anlNome').value = analise ? analise.nome : '';
+  document.getElementById('anlNasc').value = analise ? (analise.nasc || '') : '';
+  document.getElementById('anlEmail').value = analise ? (analise.email || '') : '';
+  document.getElementById('anlTelefone').value = analise ? (analise.telefone || '') : '';
+  document.getElementById('anlRenda').value = analise && analise.renda ? fmtMoeda(analise.renda) : '';
+  document.getElementById('anlAluguel').value = analise && analise.aluguel ? fmtMoeda(analise.aluguel) : '';
+  document.getElementById('anlSpc').value = analise ? (analise.spc || 'nao') : 'nao';
+  document.getElementById('anlSpcValor').value = analise && analise.spcValor ? fmtMoeda(analise.spcValor) : '';
+  document.getElementById('anlSerasa').value = analise ? (analise.serasa || 'nao') : 'nao';
+  document.getElementById('anlSerasaValor').value = analise && analise.serasaValor ? fmtMoeda(analise.serasaValor) : '';
+  document.getElementById('anlProtestos').value = analise ? (analise.protestos || 'nao') : 'nao';
+  document.getElementById('anlProtestosValor').value = analise && analise.protestosValor ? fmtMoeda(analise.protestosValor) : '';
+  document.getElementById('anlProcessos').value = analise ? (analise.processos || 'nao') : 'nao';
+  document.getElementById('anlProcessosQtd').value = analise ? (analise.processosQtd || 1) : 1;
+  document.getElementById('anlCrimes').value = analise ? (analise.crimes || 'nao') : 'nao';
+  document.getElementById('anlObs').value = analise ? (analise.obs || '') : '';
+  document.getElementById('anlFormErro').classList.remove('show');
+  document.getElementById('anlCpfErro').classList.remove('show');
+
+  toggleCondicional('anlSpc','anlSpcValorWrap','sim');
+  toggleCondicional('anlSerasa','anlSerasaValorWrap','sim');
+  toggleCondicional('anlProtestos','anlProtestosValorWrap','sim');
+  toggleCondicional('anlProcessos','anlProcessosQtdWrap','sim');
+
+  showScreen('screen-analise-form');
+  document.getElementById('navBtn').style.display = 'flex';
+  document.getElementById('footerForm').style.display = 'none';
+  document.getElementById('footerItens').style.display = 'none';
+  document.getElementById('footerAnalise').style.display = 'flex';
+  document.getElementById('headerTitle').textContent = 'Análise de Cliente';
+}
+
+function toggleCondicional(selectId, wrapId, triggerVal){
+  const sel = document.getElementById(selectId);
+  const wrap = document.getElementById(wrapId);
+  const update = () => { wrap.style.display = sel.value === triggerVal ? '' : 'none'; };
+  update();
+  sel.onchange = update;
+}
+
+function gerarAnalise(){
+  const cpf = document.getElementById('anlCpf').value.trim();
+  const nome = document.getElementById('anlNome').value.trim();
+  const erroEl = document.getElementById('anlFormErro');
+  erroEl.classList.remove('show');
+
+  if(!cpf || !nome){
+    erroEl.textContent = 'Preencha ao menos CPF e nome do cliente.';
+    erroEl.classList.add('show');
+    return;
+  }
+  if(!validarCpf(cpf)){
+    erroEl.textContent = 'CPF inválido — verifique o número digitado.';
+    erroEl.classList.add('show');
+    return;
+  }
+
+  const dados = {
+    cpf,
+    nome,
+    nasc: document.getElementById('anlNasc').value,
+    email: document.getElementById('anlEmail').value.trim(),
+    telefone: document.getElementById('anlTelefone').value.trim(),
+    renda: parseMoeda(document.getElementById('anlRenda').value),
+    aluguel: parseMoeda(document.getElementById('anlAluguel').value),
+    spc: document.getElementById('anlSpc').value,
+    spcValor: parseMoeda(document.getElementById('anlSpcValor').value),
+    serasa: document.getElementById('anlSerasa').value,
+    serasaValor: parseMoeda(document.getElementById('anlSerasaValor').value),
+    protestos: document.getElementById('anlProtestos').value,
+    protestosValor: parseMoeda(document.getElementById('anlProtestosValor').value),
+    processos: document.getElementById('anlProcessos').value,
+    processosQtd: parseInt(document.getElementById('anlProcessosQtd').value) || 1,
+    crimes: document.getElementById('anlCrimes').value,
+    obs: document.getElementById('anlObs').value.trim(),
+  };
+
+  const resultado = calcularScore(dados);
+  dados.score = resultado.score;
+  dados.nivel = resultado.nivel;
+  dados.fatores = resultado.fatores;
+  dados.dataAnalise = new Date().toISOString();
+
+  const analises = getAnalises();
+  if(currentAnaliseId){
+    const idx = analises.findIndex(a => a.id === currentAnaliseId);
+    if(idx > -1){ analises[idx] = { ...analises[idx], ...dados }; }
+    else { dados.id = currentAnaliseId; analises.push(dados); }
+  } else {
+    dados.id = Date.now().toString(36);
+    currentAnaliseId = dados.id;
+    analises.push(dados);
+  }
+  saveAnalises(analises);
+
+  exibirResultadoAnalise(dados);
+}
+
+function exibirResultadoAnalise(dados){
+  const info = nivelInfo(dados.nivel);
+  const corretor = getCorretor() || {};
+  const dataFmt = new Date(dados.dataAnalise).toLocaleDateString('pt-BR', {
+    day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+
+  const nascFmt = dados.nasc
+    ? new Date(dados.nasc + 'T12:00:00').toLocaleDateString('pt-BR')
+    : '—';
+
+  // barra de pontuação colorida
+  const barColor = dados.nivel === 'baixo' ? 'var(--ok)' :
+                   dados.nivel === 'medio' ? 'var(--warn)' :
+                   dados.nivel === 'alto'  ? '#E65100' : 'var(--danger)';
+
+  // gauge SVG semi-círculo
+  const pct = dados.score / 100;
+  const CIRC = Math.PI * 70; // raio 70
+  const offset = CIRC * (1 - pct);
+  const svgGauge = `
+    <svg viewBox="0 0 180 90" width="180" height="90">
+      <path d="M 15 90 A 70 70 0 0 1 165 90" fill="none" stroke="#E5E7EB" stroke-width="14" stroke-linecap="round"/>
+      <path d="M 15 90 A 70 70 0 0 1 165 90" fill="none" stroke="${barColor}" stroke-width="14"
+        stroke-dasharray="${CIRC}" stroke-dashoffset="${offset}" stroke-linecap="round"
+        style="transition:stroke-dashoffset .4s"/>
+    </svg>`;
+
+  // fatores
+  const fatoresHtml = dados.fatores.map(f => {
+    const icon = f.classe === 'ok' ? '✅' : f.classe === 'warn' ? '⚠️' : '❌';
+    const cls = `aci-${f.classe}`;
+    const deducaoStr = f.deducao > 0 ? `<span class="rf-val" style="color:${f.classe==='ok'?'var(--ok)':'var(--danger)'}">−${f.deducao} pts</span>` : `<span class="rf-val" style="color:var(--ok)">OK</span>`;
+    return `<div class="analise-card-list-item ${cls}">
+      <span class="aci-icon">${icon}</span>
+      <span class="aci-text">${f.label}</span>
+      ${deducaoStr}
+    </div>`;
+  }).join('');
+
+  const html = `
+    <div class="ficha-print" id="fichaPrint">
+      <div class="ficha-header">
+        <div>
+          <div class="fh-title">Ficha de Análise de Inquilino</div>
+          <div class="fh-date">${corretor.nome || ''} · ${corretor.creci ? 'CRECI ' + corretor.creci : ''}</div>
+        </div>
+        <div class="fh-date" style="text-align:right;">${dataFmt}</div>
+      </div>
+
+      <div class="ficha-info-grid">
+        <div class="fi-item">
+          <div class="fi-lbl">Nome</div>
+          <div class="fi-val">${dados.nome}</div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-lbl">CPF</div>
+          <div class="fi-val">${dados.cpf}</div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-lbl">Nascimento</div>
+          <div class="fi-val">${nascFmt}</div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-lbl">Telefone</div>
+          <div class="fi-val">${dados.telefone || '—'}</div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-lbl">E-mail</div>
+          <div class="fi-val">${dados.email || '—'}</div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-lbl">Aluguel pretendido</div>
+          <div class="fi-val">${dados.aluguel > 0 ? fmtMoeda(dados.aluguel) : '—'}</div>
+        </div>
+      </div>
+
+      <div class="risk-gauge">
+        ${svgGauge}
+        <div class="risk-score-num" style="color:${barColor}">${dados.score}</div>
+        <div class="risk-label" style="color:${barColor}">${info.label}</div>
+      </div>
+
+      <div class="score-bar">
+        <div class="score-bar-fill" style="width:${dados.score}%;background:${barColor};"></div>
+      </div>
+
+      <div class="decisao-badge ${info.badge}">${info.icone} ${info.decisao}</div>
+
+      <div class="section-label" style="margin-top:18px;">Fatores analisados</div>
+      <div class="analise-card-list">${fatoresHtml}</div>
+
+      ${dados.obs ? `<div class="section-label">Observações</div><div style="background:var(--paper-card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14px;">${dados.obs}</div>` : ''}
+
+      <div class="assinatura-block">
+        <div class="assinatura-campo">
+          <div style="min-height:40px;"></div>
+          <div class="assinatura-linha">
+            ${corretor.nome || 'Corretor'}<br>
+            ${corretor.creci ? 'CRECI ' + corretor.creci : ''}
+          </div>
+        </div>
+        <div class="assinatura-campo">
+          <div style="min-height:40px;"></div>
+          <div class="assinatura-linha">
+            ${dados.nome}<br>Cliente
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('analiseResultadoConteudo').innerHTML = html;
+
+  showScreen('screen-analise-resultado');
+  document.getElementById('navBtn').style.display = 'flex';
+  document.getElementById('footerForm').style.display = 'none';
+  document.getElementById('footerItens').style.display = 'none';
+  document.getElementById('footerAnalise').style.display = 'none';
+  document.getElementById('headerTitle').textContent = 'Ficha de Análise';
+}
+
+function confirmarExcluirAnalise(){
+  if(!confirm('Excluir esta análise permanentemente?')) return;
+  const analises = getAnalises().filter(a => a.id !== currentAnaliseId);
+  saveAnalises(analises);
+  currentAnaliseId = null;
+  goHome();
+}
+
+function renderListaAnalises(){
+  const wrap = document.getElementById('listaAnalises');
+  const analises = getAnalises().sort((a,b)=> b.dataAnalise.localeCompare(a.dataAnalise));
+  if(analises.length === 0){
+    wrap.innerHTML = `<div class="empty-state"><strong>Nenhuma análise realizada ainda</strong>Toque em "Análise" para começar.</div>`;
+    return;
+  }
+  wrap.innerHTML = '';
+  analises.forEach(a => {
+    const info = nivelInfo(a.nivel);
+    const dataFmt = new Date(a.dataAnalise).toLocaleDateString('pt-BR');
+    const card = document.createElement('div');
+    card.className = `analise-home-card nivel-${a.nivel}`;
+    card.innerHTML = `
+      <div class="row1">
+        <div class="endereco">${a.nome}</div>
+        <span class="tag" style="background:${a.nivel==='baixo'?'var(--ok-soft)':a.nivel==='medio'?'var(--warn-soft)':a.nivel==='critico'?'var(--danger-soft)':'#FFF3E0'};
+          color:${a.nivel==='baixo'?'var(--ok)':a.nivel==='medio'?'var(--warn)':a.nivel==='critico'?'var(--danger)':'#E65100'};">
+          ${info.label}
+        </span>
+      </div>
+      <div class="meta mono">${a.cpf} · Score ${a.score} · ${dataFmt}</div>`;
+    card.addEventListener('click', () => {
+      currentAnaliseId = a.id;
+      exibirResultadoAnalise(a);
+    });
+    wrap.appendChild(card);
+  });
+}
+
+// Estilo das tabs da home
+(function injectHomeTabStyle(){
+  const s = document.createElement('style');
+  s.textContent = `.home-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;padding:10px;font-size:14px;font-weight:600;color:var(--ink-soft);cursor:pointer;font-family:inherit;}.home-tab.active{color:var(--accent);border-bottom-color:var(--accent);}`;
+  document.head.appendChild(s);
+})();
 
 /* ===================== INIT ===================== */
 iniciarApp();
