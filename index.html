@@ -1136,53 +1136,39 @@
       <input type="number" id="anlProcessosQtd" min="1" placeholder="1">
     </div>
 
-    <!-- Antecedentes criminais — BNMP automático + PF semi-automático -->
+    <!-- Dívidas bancárias -->
     <div class="field">
-      <label>Antecedentes criminais</label>
-      <select id="anlCrimes">
-        <option value="nao">Sem antecedentes</option>
-        <option value="sim">Possui antecedentes</option>
+      <label>Dívidas bancárias / financeiras</label>
+      <select id="anlDividasBancarias">
+        <option value="nao">Sem dívidas</option>
+        <option value="sim">Possui dívidas</option>
         <option value="nao_consultado">Não consultado</option>
       </select>
     </div>
+    <div class="field" id="anlDividasBancariasValorWrap" style="display:none;">
+      <label>Valor estimado das dívidas (R$)</label>
+      <input type="text" inputmode="numeric" id="anlDividasBancariasValor" placeholder="R$ 0,00" oninput="this.value=formatarMoedaInput(this.value)">
+    </div>
 
-    <!-- Painel BNMP + PF -->
+    <!-- Painel protestos semi-automático -->
     <div style="background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;">
-      <div style="font-weight:700;font-size:13.5px;margin-bottom:10px;">Consultas de antecedentes</div>
-
-      <!-- BNMP -->
-      <div style="margin-bottom:12px;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">1. Mandados de prisão — CNJ BNMP <span style="font-weight:400;color:var(--ok);font-size:11.5px;">(automático)</span></div>
-        <div id="bnmpStatusWrap"></div>
-        <button class="btn btn-ghost" id="btnBNMP" style="font-size:13px;padding:9px 14px;" onclick="consultarBNMP()">🔍 Consultar mandados de prisão</button>
+      <div style="font-weight:700;font-size:13.5px;margin-bottom:6px;">Consulta de protestos em cartório</div>
+      <div style="font-size:12px;color:var(--ink-soft);margin-bottom:10px;">Abra o portal do IEPTB, pesquise pelo CPF e registre o resultado abaixo.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <a href="https://www.protestos.net.br/" target="_blank" rel="noopener"
+           class="btn btn-ghost" style="font-size:13px;padding:9px 14px;text-decoration:none;"
+           onclick="prepararAberturaProtestos()">
+          🔗 Abrir portal IEPTB
+        </a>
       </div>
-
-      <!-- PF semi-automático -->
-      <div style="border-top:1px solid var(--line);padding-top:12px;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">2. Certidão de Antecedentes — Polícia Federal <span style="font-weight:400;color:var(--warn);font-size:11.5px;">(semi-automático)</span></div>
-        <div style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">O portal da PF exige login gov.br do próprio titular. Clique abaixo para abrir o portal com o CPF copiado, consulte e registre o resultado aqui.</div>
-        <div id="pfCpfCopyBox" style="display:none;background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
-          <div style="font-size:11.5px;color:var(--accent);font-weight:600;margin-bottom:4px;">CPF para usar no portal:</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span id="pfCpfDisplay" style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;"></span>
-            <button onclick="copiarCpfPF()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;">Copiar</button>
-          </div>
+      <div id="protestosResultadoBtns" style="display:none;">
+        <div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--ink-soft);">Resultado da consulta:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="btn" style="background:var(--ok-soft);color:var(--ok);border:1.5px solid var(--ok);font-size:13px;" onclick="registrarResultadoProtestos('nao')">✅ Sem protestos</button>
+          <button class="btn" style="background:var(--danger-soft);color:var(--danger);border:1.5px solid var(--danger);font-size:13px;" onclick="registrarResultadoProtestos('sim')">❌ Possui protestos</button>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-          <a id="linkPFAntecedentes" href="https://www.pf.gov.br/servicos-pf/antecedentes-criminais" target="_blank" rel="noopener"
-             class="btn btn-ghost" style="font-size:13px;padding:9px 14px;text-decoration:none;" onclick="prepararAberturaPF()">
-            🔗 Abrir portal da PF
-          </a>
-        </div>
-        <div id="pfResultadoBtns" style="display:none;">
-          <div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--ink-soft);">Qual foi o resultado?</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <button class="btn" style="background:var(--ok-soft);color:var(--ok);border:1.5px solid var(--ok);font-size:13px;" onclick="registrarResultadoPF('nao')">✅ Certidão negativa</button>
-            <button class="btn" style="background:var(--danger-soft);color:var(--danger);border:1.5px solid var(--danger);font-size:13px;" onclick="registrarResultadoPF('sim')">❌ Possui antecedentes</button>
-          </div>
-        </div>
-        <div id="pfResultadoRegistrado" style="display:none;"></div>
       </div>
+      <div id="protestosResultadoRegistrado" style="display:none;"></div>
     </div>
 
     <div class="section-label">Consultas externas — abrir portais</div>
@@ -1191,9 +1177,9 @@
       <a class="portal-link" id="linkSerasa" target="_blank" rel="noopener">💳 Serasa Consumidor</a>
       <a class="portal-link" id="linkSpc" target="_blank" rel="noopener">📋 SPC Brasil</a>
       <a class="portal-link" id="linkJusbrasil" target="_blank" rel="noopener">⚖️ Jusbrasil</a>
-      <a class="portal-link" id="linkPF" target="_blank" rel="noopener">🔎 Antecedentes PF</a>
+      <a class="portal-link" id="linkRegistrato" href="https://registrato.bcb.gov.br" target="_blank" rel="noopener">🏦 BACEN Registrato</a>
     </div>
-    <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">Serasa e SPC exigem login do próprio titular do CPF ou contratos de bureau. Jusbrasil e PF são públicos.</div>
+    <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">Jusbrasil e Registrato são gratuitos. Serasa e SPC exigem login do titular ou contratos de bureau.</div>
 
     <div class="section-label" style="margin-top:20px;">Observações</div>
     <div class="field">
@@ -2811,15 +2797,17 @@ function calcularScore(dados){
     fatores.push({ label:'Sem processos judiciais', deducao: 0, classe:'ok' });
   }
 
-  // Crimes
-  if(dados.crimes === 'nao_consultado'){
+  // Dívidas bancárias
+  if(dados.dividasBancarias === 'nao_consultado'){
     score -= 5;
-    fatores.push({ label:'Antecedentes criminais não consultados', deducao: 5, classe:'warn' });
-  } else if(dados.crimes === 'sim'){
-    score -= 50;
-    fatores.push({ label:'Antecedentes criminais', deducao: 50, classe:'danger' });
+    fatores.push({ label:'Dívidas bancárias não consultadas', deducao: 5, classe:'warn' });
+  } else if(dados.dividasBancarias === 'sim'){
+    const v = dados.dividasBancariasValor;
+    const d = v > 10000 ? 30 : v > 3000 ? 22 : 15;
+    score -= d;
+    fatores.push({ label:`Dívidas bancárias/financeiras${v > 0 ? ' — ' + fmtMoeda(v) : ''}`, deducao: d, classe:'danger' });
   } else {
-    fatores.push({ label:'Sem antecedentes criminais', deducao: 0, classe:'ok' });
+    fatores.push({ label:'Sem dívidas bancárias', deducao: 0, classe:'ok' });
   }
 
   // Renda vs aluguel
@@ -2890,7 +2878,8 @@ function goAnaliseCliente(id){
   document.getElementById('anlProtestosValor').value = analise && analise.protestosValor ? fmtMoeda(analise.protestosValor) : '';
   document.getElementById('anlProcessos').value = analise ? (analise.processos || 'nao') : 'nao';
   document.getElementById('anlProcessosQtd').value = analise ? (analise.processosQtd || 1) : 1;
-  document.getElementById('anlCrimes').value = analise ? (analise.crimes || 'nao') : 'nao';
+  document.getElementById('anlDividasBancarias').value = analise ? (analise.dividasBancarias || 'nao_consultado') : 'nao_consultado';
+  document.getElementById('anlDividasBancariasValor').value = analise && analise.dividasBancariasValor ? fmtMoeda(analise.dividasBancariasValor) : '';
   document.getElementById('anlObs').value = analise ? (analise.obs || '') : '';
   document.getElementById('anlFormErro').classList.remove('show');
   document.getElementById('anlCpfErro').classList.remove('show');
@@ -2899,6 +2888,7 @@ function goAnaliseCliente(id){
   toggleCondicional('anlSerasa','anlSerasaValorWrap','sim');
   toggleCondicional('anlProtestos','anlProtestosValorWrap','sim');
   toggleCondicional('anlProcessos','anlProcessosQtdWrap','sim');
+  toggleCondicional('anlDividasBancarias','anlDividasBancariasValorWrap','sim');
 
   showScreen('screen-analise-form');
   document.getElementById('navBtn').style.display = 'flex';
@@ -2949,7 +2939,8 @@ function gerarAnalise(){
     protestosValor: parseMoeda(document.getElementById('anlProtestosValor').value),
     processos: document.getElementById('anlProcessos').value,
     processosQtd: parseInt(document.getElementById('anlProcessosQtd').value) || 1,
-    crimes: document.getElementById('anlCrimes').value,
+    dividasBancarias: document.getElementById('anlDividasBancarias').value,
+    dividasBancariasValor: parseMoeda(document.getElementById('anlDividasBancariasValor').value),
     obs: document.getElementById('anlObs').value.trim(),
   };
 
@@ -3166,21 +3157,16 @@ async function testarServidor(){
 
 function atualizarLinksPortais(){
   const cpf = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
-  const cpfFmt = cpf.length === 11
-    ? `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`
-    : '';
 
   const serasa   = document.getElementById('linkSerasa');
   const spc      = document.getElementById('linkSpc');
   const jusbr    = document.getElementById('linkJusbrasil');
-  const pf       = document.getElementById('linkPF');
 
   if(serasa)  serasa.href  = 'https://www.serasaconsumidor.com.br/';
   if(spc)     spc.href     = 'https://www.spcbrasil.org.br/pesquisa';
-  if(jusbr)   jusbr.href   = cpfFmt
-    ? `https://www.jusbrasil.com.br/consulta-processual/?cpf=${cpf}`
+  if(jusbr)   jusbr.href   = cpf.length === 11
+    ? `https://www.jusbrasil.com.br/consulta-processual/busca?q=${cpf}`
     : 'https://www.jusbrasil.com.br/consulta-processual/';
-  if(pf)      pf.href      = 'https://www.pf.gov.br/servicos-pf/antecedentes-criminais';
 }
 
 // Atualiza links ao digitar o CPF
@@ -3189,105 +3175,29 @@ document.addEventListener('DOMContentLoaded', () => {
   if(cpfInput) cpfInput.addEventListener('input', atualizarLinksPortais);
 });
 
-/* ===================== BNMP + PF SEMI-AUTOMÁTICO ===================== */
+/* ===================== PROTESTOS SEMI-AUTOMÁTICO ===================== */
 
-async function consultarBNMP(){
-  const cpf   = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
-  const wrap  = document.getElementById('bnmpStatusWrap');
-  const btnEl = document.getElementById('btnBNMP');
-
-  if(!validarCpf(cpf)){
-    alert('Digite um CPF válido antes de consultar o BNMP.');
-    return;
-  }
-
-  const servidor = getServidorUrl();
-  if(!servidor){
-    alert('Configure a URL do servidor em Configurações primeiro.');
-    return;
-  }
-
-  wrap.innerHTML  = `<div class="consulta-status loading" style="margin-bottom:8px;"><div class="spinner"></div> Consultando mandados de prisão no BNMP...</div>`;
-  btnEl.disabled  = true;
-
-  try {
-    const resp = await fetch(`${servidor}/api/bnmp/${cpf}`, {
-      signal: AbortSignal.timeout(15000)
-    });
-    const dados = await resp.json();
-
-    if(!dados.ok && dados.erro){
-      wrap.innerHTML = `<div class="consulta-status erro" style="margin-bottom:8px;">⚠️ BNMP indisponível: ${dados.erro}<br><span style="font-weight:400;font-size:11.5px;">Verifique manualmente em portalbnmp.cnj.jus.br</span></div>`;
-      return;
-    }
-
-    if(dados.totalMandados > 0){
-      // Auto-marca antecedentes
-      document.getElementById('anlCrimes').value = 'sim';
-
-      const lista = dados.mandados.slice(0,3).map(m =>
-        `<div style="font-size:12px;border-bottom:1px solid rgba(163,61,47,.15);padding:3px 0;">
-          <strong>${m.tipo}</strong> · ${m.tribunal}<br>
-          <span style="color:var(--ink-soft);">${m.situacao}</span>
-        </div>`
-      ).join('');
-
-      wrap.innerHTML = `
-        <div class="processos-encontrados" style="margin-bottom:8px;">
-          <strong>${dados.totalMandados} mandado(s) de prisão encontrado(s)</strong>
-          ${lista}
-        </div>`;
-    } else {
-      wrap.innerHTML = `<div class="consulta-status ok" style="margin-bottom:8px;">✓ Nenhum mandado de prisão ativo no BNMP</div>`;
-    }
-  } catch(e) {
-    wrap.innerHTML = `<div class="consulta-status erro" style="margin-bottom:8px;">✗ Erro ao consultar BNMP: ${e.message}</div>`;
-  } finally {
-    btnEl.disabled = false;
-  }
-}
-
-function prepararAberturaPF(){
+function prepararAberturaProtestos(){
   const cpf = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
-
   if(!validarCpf(cpf)){
     alert('Digite um CPF válido antes de abrir o portal.');
     return;
   }
-
-  const cpfFmt = `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`;
-
-  // Mostra CPF para copiar
-  const copyBox = document.getElementById('pfCpfCopyBox');
-  document.getElementById('pfCpfDisplay').textContent = cpfFmt;
-  copyBox.style.display = '';
-
-  // Exibe botões de resultado após 2 segundos
   setTimeout(() => {
-    document.getElementById('pfResultadoBtns').style.display = '';
-  }, 2000);
+    document.getElementById('protestosResultadoBtns').style.display = '';
+  }, 1500);
 }
 
-function copiarCpfPF(){
-  const cpf = document.getElementById('pfCpfDisplay').textContent;
-  navigator.clipboard.writeText(cpf).then(() => {
-    const btn = event.target;
-    btn.textContent = '✓ Copiado!';
-    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
-  }).catch(() => {
-    alert('CPF: ' + cpf);
-  });
-}
+function registrarResultadoProtestos(resultado){
+  document.getElementById('anlProtestos').value = resultado;
+  document.getElementById('protestosResultadoBtns').style.display = 'none';
+  document.getElementById('anlProtestosValorWrap').style.display = resultado === 'sim' ? '' : 'none';
 
-function registrarResultadoPF(resultado){
-  document.getElementById('anlCrimes').value = resultado;
-  document.getElementById('pfResultadoBtns').style.display = 'none';
-
-  const regEl = document.getElementById('pfResultadoRegistrado');
+  const regEl = document.getElementById('protestosResultadoRegistrado');
   if(resultado === 'nao'){
-    regEl.innerHTML = `<div class="consulta-status ok" style="margin-top:6px;">✅ Certidão negativa registrada</div>`;
+    regEl.innerHTML = `<div class="consulta-status ok" style="margin-top:6px;">✅ Sem protestos registrado</div>`;
   } else {
-    regEl.innerHTML = `<div class="consulta-status erro" style="margin-top:6px;">❌ Antecedentes registrados — impacto no score aplicado</div>`;
+    regEl.innerHTML = `<div class="consulta-status erro" style="margin-top:6px;">❌ Protestos registrados — informe o valor acima</div>`;
   }
   regEl.style.display = '';
 }
@@ -3334,17 +3244,30 @@ async function consultarAutomatico(){
       document.getElementById('anlProcessosQtd').value = dados.totalProcessos;
       document.getElementById('anlProcessosQtdWrap').style.display = '';
 
-      const detalhes = dados.processos.slice(0, 5).map(p =>
-        `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid rgba(163,61,47,.15);">
-          <strong>${p.tribunal}</strong> · ${p.numero}<br>
+      // Detecta possíveis dívidas bancárias nos processos
+      const KWDS_BANCO = /execu[cç][aã]o|cobran[cç]a|banco|financeira|cr[eé]dito|empr[eé]stimo|leasing|cartão|inadimpl/i;
+      const processosBanco = dados.processos.filter(p =>
+        KWDS_BANCO.test(p.classe + ' ' + p.assunto + ' ' + p.tribunalNome)
+      );
+
+      if(processosBanco.length > 0 && document.getElementById('anlDividasBancarias').value === 'nao_consultado'){
+        document.getElementById('anlDividasBancarias').value = 'sim';
+        document.getElementById('anlDividasBancariasValorWrap').style.display = '';
+      }
+
+      const detalhes = dados.processos.slice(0, 5).map(p => {
+        const isBanco = KWDS_BANCO.test(p.classe + ' ' + p.assunto + ' ' + p.tribunalNome);
+        return `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid rgba(163,61,47,.15);">
+          <strong>${p.tribunal}</strong> · ${p.numero}${isBanco ? ' <span style="background:var(--warn-soft);color:var(--warn);font-size:10.5px;padding:1px 5px;border-radius:4px;font-weight:600;">dívida bancária</span>' : ''}<br>
           <span style="color:var(--ink-soft);">${p.classe} — ${p.assunto}</span>
-        </div>`
-      ).join('');
+        </div>`;
+      }).join('');
 
       resWrap.style.display = '';
       resWrap.innerHTML = `
         <div class="processos-encontrados">
           <strong>${dados.totalProcessos} processo(s) encontrado(s)</strong>
+          ${processosBanco.length > 0 ? `<div style="font-size:12px;color:var(--warn);font-weight:600;margin:4px 0;">⚠️ ${processosBanco.length} processo(s) com indicativo de dívida bancária</div>` : ''}
           ${detalhes}
           ${dados.totalProcessos > 5 ? `<div style="font-size:12px;margin-top:4px;">... e mais ${dados.totalProcessos - 5} processo(s)</div>` : ''}
         </div>`;
