@@ -1136,7 +1136,7 @@
       <input type="number" id="anlProcessosQtd" min="1" placeholder="1">
     </div>
 
-    <!-- Antecedentes criminais -->
+    <!-- Antecedentes criminais — BNMP automático + PF semi-automático -->
     <div class="field">
       <label>Antecedentes criminais</label>
       <select id="anlCrimes">
@@ -1144,6 +1144,45 @@
         <option value="sim">Possui antecedentes</option>
         <option value="nao_consultado">Não consultado</option>
       </select>
+    </div>
+
+    <!-- Painel BNMP + PF -->
+    <div style="background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;">
+      <div style="font-weight:700;font-size:13.5px;margin-bottom:10px;">Consultas de antecedentes</div>
+
+      <!-- BNMP -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">1. Mandados de prisão — CNJ BNMP <span style="font-weight:400;color:var(--ok);font-size:11.5px;">(automático)</span></div>
+        <div id="bnmpStatusWrap"></div>
+        <button class="btn btn-ghost" id="btnBNMP" style="font-size:13px;padding:9px 14px;" onclick="consultarBNMP()">🔍 Consultar mandados de prisão</button>
+      </div>
+
+      <!-- PF semi-automático -->
+      <div style="border-top:1px solid var(--line);padding-top:12px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">2. Certidão de Antecedentes — Polícia Federal <span style="font-weight:400;color:var(--warn);font-size:11.5px;">(semi-automático)</span></div>
+        <div style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">O portal da PF exige login gov.br do próprio titular. Clique abaixo para abrir o portal com o CPF copiado, consulte e registre o resultado aqui.</div>
+        <div id="pfCpfCopyBox" style="display:none;background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+          <div style="font-size:11.5px;color:var(--accent);font-weight:600;margin-bottom:4px;">CPF para usar no portal:</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="pfCpfDisplay" style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;"></span>
+            <button onclick="copiarCpfPF()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;">Copiar</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <a id="linkPFAntecedentes" href="https://www.pf.gov.br/servicos-pf/antecedentes-criminais" target="_blank" rel="noopener"
+             class="btn btn-ghost" style="font-size:13px;padding:9px 14px;text-decoration:none;" onclick="prepararAberturaPF()">
+            🔗 Abrir portal da PF
+          </a>
+        </div>
+        <div id="pfResultadoBtns" style="display:none;">
+          <div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--ink-soft);">Qual foi o resultado?</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button class="btn" style="background:var(--ok-soft);color:var(--ok);border:1.5px solid var(--ok);font-size:13px;" onclick="registrarResultadoPF('nao')">✅ Certidão negativa</button>
+            <button class="btn" style="background:var(--danger-soft);color:var(--danger);border:1.5px solid var(--danger);font-size:13px;" onclick="registrarResultadoPF('sim')">❌ Possui antecedentes</button>
+          </div>
+        </div>
+        <div id="pfResultadoRegistrado" style="display:none;"></div>
+      </div>
     </div>
 
     <div class="section-label">Consultas externas — abrir portais</div>
@@ -3149,6 +3188,109 @@ document.addEventListener('DOMContentLoaded', () => {
   const cpfInput = document.getElementById('anlCpf');
   if(cpfInput) cpfInput.addEventListener('input', atualizarLinksPortais);
 });
+
+/* ===================== BNMP + PF SEMI-AUTOMÁTICO ===================== */
+
+async function consultarBNMP(){
+  const cpf   = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
+  const wrap  = document.getElementById('bnmpStatusWrap');
+  const btnEl = document.getElementById('btnBNMP');
+
+  if(!validarCpf(cpf)){
+    alert('Digite um CPF válido antes de consultar o BNMP.');
+    return;
+  }
+
+  const servidor = getServidorUrl();
+  if(!servidor){
+    alert('Configure a URL do servidor em Configurações primeiro.');
+    return;
+  }
+
+  wrap.innerHTML  = `<div class="consulta-status loading" style="margin-bottom:8px;"><div class="spinner"></div> Consultando mandados de prisão no BNMP...</div>`;
+  btnEl.disabled  = true;
+
+  try {
+    const resp = await fetch(`${servidor}/api/bnmp/${cpf}`, {
+      signal: AbortSignal.timeout(15000)
+    });
+    const dados = await resp.json();
+
+    if(!dados.ok && dados.erro){
+      wrap.innerHTML = `<div class="consulta-status erro" style="margin-bottom:8px;">⚠️ BNMP indisponível: ${dados.erro}<br><span style="font-weight:400;font-size:11.5px;">Verifique manualmente em portalbnmp.cnj.jus.br</span></div>`;
+      return;
+    }
+
+    if(dados.totalMandados > 0){
+      // Auto-marca antecedentes
+      document.getElementById('anlCrimes').value = 'sim';
+
+      const lista = dados.mandados.slice(0,3).map(m =>
+        `<div style="font-size:12px;border-bottom:1px solid rgba(163,61,47,.15);padding:3px 0;">
+          <strong>${m.tipo}</strong> · ${m.tribunal}<br>
+          <span style="color:var(--ink-soft);">${m.situacao}</span>
+        </div>`
+      ).join('');
+
+      wrap.innerHTML = `
+        <div class="processos-encontrados" style="margin-bottom:8px;">
+          <strong>${dados.totalMandados} mandado(s) de prisão encontrado(s)</strong>
+          ${lista}
+        </div>`;
+    } else {
+      wrap.innerHTML = `<div class="consulta-status ok" style="margin-bottom:8px;">✓ Nenhum mandado de prisão ativo no BNMP</div>`;
+    }
+  } catch(e) {
+    wrap.innerHTML = `<div class="consulta-status erro" style="margin-bottom:8px;">✗ Erro ao consultar BNMP: ${e.message}</div>`;
+  } finally {
+    btnEl.disabled = false;
+  }
+}
+
+function prepararAberturaPF(){
+  const cpf = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');
+
+  if(!validarCpf(cpf)){
+    alert('Digite um CPF válido antes de abrir o portal.');
+    return;
+  }
+
+  const cpfFmt = `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`;
+
+  // Mostra CPF para copiar
+  const copyBox = document.getElementById('pfCpfCopyBox');
+  document.getElementById('pfCpfDisplay').textContent = cpfFmt;
+  copyBox.style.display = '';
+
+  // Exibe botões de resultado após 2 segundos
+  setTimeout(() => {
+    document.getElementById('pfResultadoBtns').style.display = '';
+  }, 2000);
+}
+
+function copiarCpfPF(){
+  const cpf = document.getElementById('pfCpfDisplay').textContent;
+  navigator.clipboard.writeText(cpf).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  }).catch(() => {
+    alert('CPF: ' + cpf);
+  });
+}
+
+function registrarResultadoPF(resultado){
+  document.getElementById('anlCrimes').value = resultado;
+  document.getElementById('pfResultadoBtns').style.display = 'none';
+
+  const regEl = document.getElementById('pfResultadoRegistrado');
+  if(resultado === 'nao'){
+    regEl.innerHTML = `<div class="consulta-status ok" style="margin-top:6px;">✅ Certidão negativa registrada</div>`;
+  } else {
+    regEl.innerHTML = `<div class="consulta-status erro" style="margin-top:6px;">❌ Antecedentes registrados — impacto no score aplicado</div>`;
+  }
+  regEl.style.display = '';
+}
 
 async function consultarAutomatico(){
   const cpf    = (document.getElementById('anlCpf')?.value || '').replace(/\D/g, '');

@@ -116,6 +116,76 @@ async function consultarTribunal(tribunal, cpfDigits) {
 }
 
 // ---------------------------------------------------------------------------
+// CNJ BNMP — Banco Nacional de Monitoramento de Prisões
+// Portal público: https://portalbnmp.cnj.jus.br
+// ---------------------------------------------------------------------------
+const BNMP_BASE = 'https://portalbnmp.cnj.jus.br/bnmpportal/api';
+
+async function consultarBNMP(cpf) {
+  const controller = new AbortController();
+  const timeout    = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    // Primeiro obtém token público do portal BNMP
+    const tokenResp = await fetch(`${BNMP_BASE}/login/auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'guest', password: 'guest' }),
+      signal: controller.signal,
+    });
+
+    let authHeader = '';
+    if (tokenResp.ok) {
+      const tokenData = await tokenResp.json().catch(() => ({}));
+      if (tokenData.token) authHeader = `Bearer ${tokenData.token}`;
+    }
+
+    // Busca mandados pelo CPF
+    const searchResp = await fetch(`${BNMP_BASE}/pesquisa-pecas/filter/penal`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authHeader ? { 'Authorization': authHeader } : {}),
+      },
+      body: JSON.stringify({
+        cpf,
+        pagina: 1,
+        tamanhoPagina: 20,
+        buscaOrgaoJulgador: {},
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!searchResp.ok) return { ok: false, erro: `BNMP HTTP ${searchResp.status}`, mandados: [] };
+
+    const data = await searchResp.json();
+    const hits  = data.content || data.hits?.hits || data.data || [];
+
+    const mandados = hits.map(h => {
+      const s = h._source || h;
+      return {
+        tipo:      s.tipoPeca?.descricao || s.tipo || 'Mandado de prisão',
+        situacao:  s.situacaoMandado?.descricao || s.situacao || '—',
+        tribunal:  s.orgaoJulgador?.tribunal?.sigla || s.tribunal || '—',
+        orgao:     s.orgaoJulgador?.descricao || '—',
+        dataExpedicao: s.dataExpedicao || s.dataPeca || null,
+        nome:      s.nome || s.nomeParte || '—',
+      };
+    });
+
+    return {
+      ok: true,
+      totalMandados: mandados.length,
+      mandados,
+    };
+  } catch (e) {
+    clearTimeout(timeout);
+    return { ok: false, erro: e.message, mandados: [] };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Rotas
 // ---------------------------------------------------------------------------
 
@@ -127,6 +197,15 @@ app.get('/api/status', (_req, res) => {
     tribunais: TODOS_TRIBUNAIS.length,
     timestamp: new Date().toISOString(),
   });
+});
+
+// BNMP — mandados de prisão ativos
+app.get('/api/bnmp/:cpf', async (req, res) => {
+  const cpf = req.params.cpf.replace(/\D/g, '');
+  if (!validarCpf(cpf)) return res.status(400).json({ erro: 'CPF inválido' });
+
+  const resultado = await consultarBNMP(cpf);
+  res.json({ cpf, ...resultado });
 });
 
 // Consulta principal: processos por CPF
